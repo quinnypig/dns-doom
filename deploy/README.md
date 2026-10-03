@@ -3,7 +3,7 @@
 The deployment lives at `/home/cquinn/src/dns-doom` on `claude-superfund`, outside
 the T3 scratch directory. It runs as the `cquinn` user with systemd user lingering
 enabled. The web service listens only on `127.0.0.1:8770`. The named Cloudflare Tunnel `dnsdoom` supplies HTTPS at
-`https://doom.shitposting.cloud`. The existing browser access key remains enabled;
+`https://doom.shitposting.cloud`. The default view is public and read-only; a separate interactive key is enabled.
 the private entry link is stored in `~/.config/dnsdoom/access-url` (mode 0600).
 
 ## Operations
@@ -108,3 +108,16 @@ journalctl --user -u dnsdoom-actions.service -n 100
 gh run list --repo pipeline-of-regret/dns-doom
 gh workflow run ci.yml --repo pipeline-of-regret/dns-doom --ref main
 ```
+
+## Public viewing and interactive access
+
+Share https://doom.shitposting.cloud/ with no key. Anonymous visitors can view
+the current image, progress, report, and result JSON. Run/Stop requests require
+the interactive cookie. The control toolbar appears only with valid interactive
+access. Missing or invalid keys grant no control; old access links redirect to
+the public homepage and clear the access cookie without an error.
+
+The interactive key was rotated on 2026-10-03. The current private entry URL is
+stored only in `~/.config/dnsdoom/access-url`. To rotate again, replace
+`DNSDEMO_ACCESS_TOKEN` in the private environment file and restart the web service;
+existing cookies become read-only. Update the private URL file at the same time.

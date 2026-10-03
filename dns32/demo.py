@@ -100,21 +100,23 @@ class Handler(BaseHTTPRequestHandler):
         if typ=='application/json':data=json.dumps(data).encode()
         self.send_response(code);self.send_header('Content-Type',typ);self.send_header('Cache-Control','no-store');self.send_header('Referrer-Policy','no-referrer');self.send_header('Content-Length',str(len(data)));self.end_headers();self.wfile.write(data)
     def authenticated(self):
-        if not ACCESS_TOKEN:return True
+        if not ACCESS_TOKEN:return False
         try:
             cookies=SimpleCookie(self.headers.get('Cookie',''))
             return 'dnsdemo' in cookies and hmac.compare_digest(cookies['dnsdemo'].value,ACCESS_TOKEN)
         except Exception:return False
     def do_GET(self):
-        token=parse_qs(urlparse(self.path).query).get('access',[''])[0]
-        if ACCESS_TOKEN and token and hmac.compare_digest(token,ACCESS_TOKEN):
+        query=parse_qs(urlparse(self.path).query,keep_blank_values=True)
+        if 'access' in query:
+            token=query['access'][0]
+            valid=bool(ACCESS_TOKEN and hmac.compare_digest(token,ACCESS_TOKEN))
             self.send_response(303);self.send_header('Location','/');self.send_header('Cache-Control','no-store');self.send_header('Referrer-Policy','no-referrer')
             secure='; Secure' if self.headers.get('X-Forwarded-Proto')=='https' else ''
-            self.send_header('Set-Cookie',f'dnsdemo={ACCESS_TOKEN}; Path=/; HttpOnly; SameSite=Lax{secure}');self.end_headers();return
-        if not self.authenticated():return self.send(403,{'error':'Open the private demo link to connect.'})
+            cookie=f'dnsdemo={ACCESS_TOKEN}' if valid else 'dnsdemo=; Max-Age=0'
+            self.send_header('Set-Cookie',cookie+f'; Path=/; HttpOnly; SameSite=Lax{secure}');self.end_headers();return
         path=urlparse(self.path).path
         if path=='/':return self.send(200,Path(__file__).with_name('demo.html').read_bytes(),'text/html; charset=utf-8')
-        if path=='/api/status':return self.send(200,status())
+        if path=='/api/status':return self.send(200,{**status(),'can_control':self.authenticated()})
         if path in ('/api/image','/api/report','/api/result'):
             with lock:out=job['output'] if job else None
             if out:

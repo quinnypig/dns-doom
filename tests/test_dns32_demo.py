@@ -28,3 +28,59 @@ class RecoveryTests(unittest.TestCase):
         with patch.object(demo,'job',{'phase':'stopped','thread':Mock(is_alive=lambda:True)}):
             with self.assertRaisesRegex(ValueError,'stopping'):
                 demo.start('fibonacci','bind',True)
+
+class AccessTests(unittest.TestCase):
+    def setUp(self):
+        import threading
+        from unittest.mock import patch
+        self.patch=patch.object(demo,'ACCESS_TOKEN','new-interactive-key')
+        self.patch.start()
+        self.server=demo.ThreadingHTTPServer(('127.0.0.1',0),demo.Handler)
+        self.thread=threading.Thread(target=self.server.serve_forever,daemon=True)
+        self.thread.start()
+
+    def tearDown(self):
+        self.server.shutdown();self.server.server_close();self.thread.join()
+        self.patch.stop()
+
+    def request(self,path,method='GET',cookie=None):
+        import http.client
+        conn=http.client.HTTPConnection(*self.server.server_address)
+        headers={'Cookie':cookie} if cookie else {}
+        conn.request(method,path,headers=headers)
+        response=conn.getresponse()
+        result=(response.status,dict(response.getheaders()),response.read())
+        conn.close()
+        return result
+
+    def test_anonymous_can_view_but_cannot_run_or_stop(self):
+        self.assertEqual(self.request('/')[0],200)
+        code,_,body=self.request('/api/status')
+        self.assertEqual(code,200)
+        self.assertFalse(json.loads(body)['can_control'])
+        for path in ('/api/run','/api/stop'):
+            self.assertEqual(self.request(path,'POST')[0],403)
+
+    def test_old_link_silently_redirects_and_clears_cookie(self):
+        code,headers,_=self.request('/?access=old-key',cookie='dnsdemo=old-key')
+        self.assertEqual(code,303)
+        self.assertEqual(headers['Location'],'/')
+        self.assertIn('Max-Age=0',headers['Set-Cookie'])
+        self.assertEqual(self.request('/')[0],200)
+        self.assertEqual(self.request('/api/stop','POST','dnsdemo=old-key')[0],403)
+
+    def test_new_key_grants_control_without_leaking_into_status(self):
+        code,headers,_=self.request('/?access=new-interactive-key')
+        self.assertEqual(code,303)
+        cookie=headers['Set-Cookie'].split(';')[0]
+        code,_,body=self.request('/api/status',cookie=cookie)
+        self.assertTrue(json.loads(body)['can_control'])
+        self.assertNotIn(b'new-interactive-key',body)
+        from unittest.mock import patch
+        with patch.object(demo,'job',None):
+            self.assertEqual(self.request('/api/stop','POST',cookie)[0],409)
+
+    def test_missing_configured_key_does_not_enable_anonymous_controls(self):
+        from unittest.mock import patch
+        with patch.object(demo,'ACCESS_TOKEN',''):
+            self.assertEqual(self.request('/api/run','POST')[0],403)
