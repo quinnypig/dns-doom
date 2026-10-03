@@ -45,7 +45,7 @@ jobs:
   deploy:
     needs: test
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    runs-on: [self-hosted, linux, x64, dnsdoom-production]
+    runs-on: [self-hosted, linux, ARM64, dnsdoom-production]
     timeout-minutes: 45
     concurrency:
       group: dnsdoom-production
