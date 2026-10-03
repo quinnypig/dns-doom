@@ -1,0 +1,14 @@
+{
+  "service": "dnsdoom.service",
+  "host": "claude-superfund",
+  "path": "/home/cquinn/src/dns-doom",
+  "boot_enabled": true,
+  "restart_recovery": "passed",
+  "interrupted_container_cleanup": "passed",
+  "unit_tests_passed": 20,
+  "full_doom_run": "c744522243",
+  "elapsed": 150.94005709304474,
+  "reference_pixels_match": true,
+  "hostname": "pending user choice",
+  "tunnel_created": false
+}

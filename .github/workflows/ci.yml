@@ -1,0 +1,58 @@
+name: Test and deploy
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: dns-doom-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Unit, differential, and live BIND and Knot tests
+        run: ./run-rv32.sh test
+      - name: Render a complete Doom tick through DNS
+        run: ./run-rv32.sh fast
+      - name: Verify renderer and machine state
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('artifacts/dns32-tick/run.json').read_text())
+          for field in ('reference_pixels_match', 'reference_registers_match', 'reference_game_state_match', 'reference_pc_match'):
+              assert report.get(field) is True, (field, report.get(field))
+          PY
+      - name: Save validation evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: validation-${{ github.sha }}
+          retention-days: 14
+          path: |
+            artifacts/dns32-tick/run.json
+            artifacts/dns32-tick/dns-view.png
+            artifacts/dns32-tick/index.html
+            artifacts/performance/*live.json
+  deploy:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: [self-hosted, linux, x64, dnsdoom-production]
+    timeout-minutes: 45
+    concurrency:
+      group: dnsdoom-production
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Build, promote, and check production (automatic rollback on failure)
+        run: python3 deploy/release.py

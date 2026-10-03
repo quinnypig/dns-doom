@@ -1,0 +1,7 @@
+.git
+.venv
+__pycache__
+artifacts
+*.pyc
+*.so
+*.log

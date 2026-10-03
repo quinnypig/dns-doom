@@ -1,0 +1,7 @@
+ARG BASE_IMAGE=dns1:local
+FROM ${BASE_IMAGE}
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc-riscv64-unknown-elf binutils-riscv64-unknown-elf knot g++ \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /work
+ENTRYPOINT ["python", "-m", "dns32"]

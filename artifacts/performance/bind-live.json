@@ -1,0 +1,10 @@
+{
+  "live_instruction_cases": 80,
+  "dns_transactions": 3950,
+  "fault_injection": "passed",
+  "server": "bind",
+  "native": true,
+  "optimized": true,
+  "packed": true,
+  "stale_update": "rejected"
+}

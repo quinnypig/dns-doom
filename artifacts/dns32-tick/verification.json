@@ -1,0 +1,8 @@
+{
+  "instructions": true,
+  "pc": true,
+  "registers": true,
+  "engine_after": true,
+  "pixels_sha256": true,
+  "pixels": true
+}

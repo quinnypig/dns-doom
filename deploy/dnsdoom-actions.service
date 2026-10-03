@@ -1,0 +1,20 @@
+[Unit]
+Description=GitHub Actions runner for private DNS Doom repository
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+WorkingDirectory=%h/.local/share/dnsdoom-runner
+ExecStart=%h/.local/share/dnsdoom-runner/run.sh
+Environment=XDG_RUNTIME_DIR=%t
+Environment=DBUS_SESSION_BUS_ADDRESS=unix:path=%t/bus
+Restart=always
+RestartSec=5
+TimeoutStopSec=300
+KillMode=control-group
+UMask=0077
+
+[Install]
+WantedBy=default.target

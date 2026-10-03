@@ -1,0 +1,1082 @@
+{
+  "backend": "DNS / stock BIND",
+  "elf": "artifacts/rv32/fibonacci.elf",
+  "status": "exited",
+  "exit_code": 0,
+  "frames": 0,
+  "instructions": 132,
+  "elapsed": 0.05977073707617819,
+  "pc": "00010014",
+  "registers": {
+    "r00": "00000000",
+    "r01": "0001000c",
+    "r02": "07fffff0",
+    "r03": "00000000",
+    "r04": "00000000",
+    "r05": "00000000",
+    "r06": "00000000",
+    "r07": "00000000",
+    "r08": "00000000",
+    "r09": "00000000",
+    "r10": "00000000",
+    "r11": "00000000",
+    "r12": "00000000",
+    "r13": "00000000",
+    "r14": "0000000c",
+    "r15": "0000000c",
+    "r16": "000100b4",
+    "r17": "00000000",
+    "r18": "00000000",
+    "r19": "00000000",
+    "r20": "00000000",
+    "r21": "00000000",
+    "r22": "00000000",
+    "r23": "00000000",
+    "r24": "00000000",
+    "r25": "00000000",
+    "r26": "00000000",
+    "r27": "00000000",
+    "r28": "00000000",
+    "r29": "00000000",
+    "r30": "00000000",
+    "r31": "00000000"
+  },
+  "dns_transactions": 1620,
+  "payload_bytes": 285634,
+  "instruction_counts": {
+    "LUI": 4,
+    "ADDI": 48,
+    "JAL": 1,
+    "LW": 14,
+    "BEQ": 1,
+    "SLLI": 12,
+    "ADD": 24,
+    "SW": 12,
+    "BLTU": 12,
+    "ECALL": 2,
+    "SLTU": 1,
+    "JALR": 1
+  },
+  "milestones": [],
+  "sample_dns_requests": [
+    {
+      "name": "pc.reg",
+      "request_bytes": 32,
+      "response_bytes": 86
+    },
+    {
+      "name": "00010000.code",
+      "request_bytes": 39,
+      "response_bytes": 206
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 123,
+      "response_bytes": 25
+    },
+    {
+      "name": "pc.reg",
+      "request_bytes": 32,
+      "response_bytes": 86
+    },
+    {
+      "name": "00010004.code",
+      "request_bytes": 39,
+      "response_bytes": 509
+    },
+    {
+      "name": "r02.reg",
+      "request_bytes": 33,
+      "response_bytes": 87
+    },
+    {
+      "name": "00.f0.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.ff.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.ff.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "08.ff.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 123,
+      "response_bytes": 25
+    },
+    {
+      "name": "pc.reg",
+      "request_bytes": 32,
+      "response_bytes": 86
+    },
+    {
+      "name": "00010008.code",
+      "request_bytes": 39,
+      "response_bytes": 206
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 123,
+      "response_bytes": 25
+    },
+    {
+      "name": "pc.reg",
+      "request_bytes": 32,
+      "response_bytes": 86
+    },
+    {
+      "name": "00010018.code",
+      "request_bytes": 39,
+      "response_bytes": 206
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 123,
+      "response_bytes": 25
+    },
+    {
+      "name": "pc.reg",
+      "request_bytes": 32,
+      "response_bytes": 86
+    },
+    {
+      "name": "0001001c.code",
+      "request_bytes": 39,
+      "response_bytes": 1553
+    },
+    {
+      "name": "r10.reg",
+      "request_bytes": 33,
+      "response_bytes": 87
+    },
+    {
+      "name": "00.b0.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "01.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "000100b0.mem",
+      "request_bytes": 38,
+      "response_bytes": 86
+    },
+    {
+      "name": "b0.01.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "01.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "000100b1.mem",
+      "request_bytes": 38,
+      "response_bytes": 86
+    },
+    {
+      "name": "b1.01.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "01.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "000100b2.mem",
+      "request_bytes": 38,
+      "response_bytes": 86
+    },
+    {
+      "name": "b2.01.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "01.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "000100b3.mem",
+      "request_bytes": 38,
+      "response_bytes": 86
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 123,
+      "response_bytes": 25
+    },
+    {
+      "name": "pc.reg",
+      "request_bytes": 32,
+      "response_bytes": 86
+    },
+    {
+      "name": "00010020.code",
+      "request_bytes": 39,
+      "response_bytes": 206
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 123,
+      "response_bytes": 25
+    },
+    {
+      "name": "pc.reg",
+      "request_bytes": 32,
+      "response_bytes": 86
+    },
+    {
+      "name": "00010024.code",
+      "request_bytes": 39,
+      "response_bytes": 509
+    },
+    {
+      "name": "r16.reg",
+      "request_bytes": 33,
+      "response_bytes": 87
+    },
+    {
+      "name": "00.b4.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "01.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 123,
+      "response_bytes": 25
+    },
+    {
+      "name": "pc.reg",
+      "request_bytes": 32,
+      "response_bytes": 86
+    },
+    {
+      "name": "00010028.code",
+      "request_bytes": 39,
+      "response_bytes": 673
+    },
+    {
+      "name": "r15.reg",
+      "request_bytes": 33,
+      "response_bytes": 87
+    },
+    {
+      "name": "00.00.eq.cmp",
+      "request_bytes": 38,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.eq.cmp",
+      "request_bytes": 38,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.eq.cmp",
+      "request_bytes": 38,
+      "response_bytes": 86
+    },
+    {
+      "name": "0c.00.eq.cmp",
+      "request_bytes": 38,
+      "response_bytes": 86
+    },
+    {
+      "name": "gt.eq.cond",
+      "request_bytes": 36,
+      "response_bytes": 83
+    },
+    {
+      "name": "00.00.0.mux",
+      "request_bytes": 37,
+      "response_bytes": 85
+    },
+    {
+      "name": "01.01.0.mux",
+      "request_bytes": 37,
+      "response_bytes": 85
+    },
+    {
+      "name": "00.00.0.mux",
+      "request_bytes": 37,
+      "response_bytes": 85
+    },
+    {
+      "name": "2c.5c.0.mux",
+      "request_bytes": 37,
+      "response_bytes": 85
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 86,
+      "response_bytes": 25
+    },
+    {
+      "name": "pc.reg",
+      "request_bytes": 32,
+      "response_bytes": 86
+    },
+    {
+      "name": "0001002c.code",
+      "request_bytes": 39,
+      "response_bytes": 461
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 123,
+      "response_bytes": 25
+    },
+    {
+      "name": "pc.reg",
+      "request_bytes": 32,
+      "response_bytes": 86
+    },
+    {
+      "name": "00010030.code",
+      "request_bytes": 39,
+      "response_bytes": 461
+    },
+    {
+      "name": "00.01.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 123,
+      "response_bytes": 25
+    },
+    {
+      "name": "pc.reg",
+      "request_bytes": 32,
+      "response_bytes": 86
+    },
+    {
+      "name": "00010034.code",
+      "request_bytes": 39,
+      "response_bytes": 461
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 123,
+      "response_bytes": 25
+    },
+    {
+      "name": "pc.reg",
+      "request_bytes": 32,
+      "response_bytes": 86
+    },
+    {
+      "name": "00010038.code",
+      "request_bytes": 39,
+      "response_bytes": 465
+    },
+    {
+      "name": "r15.reg",
+      "request_bytes": 33,
+      "response_bytes": 87
+    },
+    {
+      "name": "00.00.2.shl",
+      "request_bytes": 37,
+      "response_bytes": 85
+    },
+    {
+      "name": "00.00.2.shl",
+      "request_bytes": 37,
+      "response_bytes": 85
+    },
+    {
+      "name": "00.00.2.shl",
+      "request_bytes": 37,
+      "response_bytes": 85
+    },
+    {
+      "name": "00.00.2.shl",
+      "request_bytes": 37,
+      "response_bytes": 85
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 123,
+      "response_bytes": 25
+    },
+    {
+      "name": "pc.reg",
+      "request_bytes": 32,
+      "response_bytes": 86
+    },
+    {
+      "name": "0001003c.code",
+      "request_bytes": 39,
+      "response_bytes": 555
+    },
+    {
+      "name": "r16.reg",
+      "request_bytes": 33,
+      "response_bytes": 87
+    },
+    {
+      "name": "r14.reg",
+      "request_bytes": 33,
+      "response_bytes": 87
+    },
+    {
+      "name": "b4.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "01.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 123,
+      "response_bytes": 25
+    },
+    {
+      "name": "pc.reg",
+      "request_bytes": 32,
+      "response_bytes": 86
+    },
+    {
+      "name": "00010040.code",
+      "request_bytes": 39,
+      "response_bytes": 1520
+    },
+    {
+      "name": "r14.reg",
+      "request_bytes": 33,
+      "response_bytes": 87
+    },
+    {
+      "name": "b4.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "01.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "r13.reg",
+      "request_bytes": 33,
+      "response_bytes": 87
+    },
+    {
+      "name": "b4.01.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "01.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "b5.01.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "01.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "b6.01.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "01.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 234,
+      "response_bytes": 25
+    },
+    {
+      "name": "pc.reg",
+      "request_bytes": 32,
+      "response_bytes": 86
+    },
+    {
+      "name": "00010044.code",
+      "request_bytes": 39,
+      "response_bytes": 1553
+    },
+    {
+      "name": "r10.reg",
+      "request_bytes": 33,
+      "response_bytes": 87
+    },
+    {
+      "name": "00.b0.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "01.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "000100b0.mem",
+      "request_bytes": 38,
+      "response_bytes": 86
+    },
+    {
+      "name": "b0.01.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "01.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "000100b1.mem",
+      "request_bytes": 38,
+      "response_bytes": 86
+    },
+    {
+      "name": "b1.01.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "01.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "000100b2.mem",
+      "request_bytes": 38,
+      "response_bytes": 86
+    },
+    {
+      "name": "b2.01.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "01.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "000100b3.mem",
+      "request_bytes": 38,
+      "response_bytes": 86
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 123,
+      "response_bytes": 25
+    },
+    {
+      "name": "pc.reg",
+      "request_bytes": 32,
+      "response_bytes": 86
+    },
+    {
+      "name": "00010048.code",
+      "request_bytes": 39,
+      "response_bytes": 509
+    },
+    {
+      "name": "r12.reg",
+      "request_bytes": 33,
+      "response_bytes": 87
+    },
+    {
+      "name": "01.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 123,
+      "response_bytes": 25
+    },
+    {
+      "name": "pc.reg",
+      "request_bytes": 32,
+      "response_bytes": 86
+    },
+    {
+      "name": "0001004c.code",
+      "request_bytes": 39,
+      "response_bytes": 509
+    },
+    {
+      "name": "r15.reg",
+      "request_bytes": 33,
+      "response_bytes": 87
+    },
+    {
+      "name": "00.01.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 123,
+      "response_bytes": 25
+    },
+    {
+      "name": "pc.reg",
+      "request_bytes": 32,
+      "response_bytes": 86
+    },
+    {
+      "name": "00010050.code",
+      "request_bytes": 39,
+      "response_bytes": 555
+    },
+    {
+      "name": "r12.reg",
+      "request_bytes": 33,
+      "response_bytes": 87
+    },
+    {
+      "name": "r13.reg",
+      "request_bytes": 33,
+      "response_bytes": 87
+    },
+    {
+      "name": "01.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 123,
+      "response_bytes": 25
+    },
+    {
+      "name": "pc.reg",
+      "request_bytes": 32,
+      "response_bytes": 86
+    },
+    {
+      "name": "00010054.code",
+      "request_bytes": 39,
+      "response_bytes": 509
+    },
+    {
+      "name": "r11.reg",
+      "request_bytes": 33,
+      "response_bytes": 87
+    },
+    {
+      "name": "01.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 86
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 123,
+      "response_bytes": 25
+    },
+    {
+      "name": "pc.reg",
+      "request_bytes": 32,
+      "response_bytes": 86
+    },
+    {
+      "name": "00010058.code",
+      "request_bytes": 39,
+      "response_bytes": 724
+    },
+    {
+      "name": "r15.reg",
+      "request_bytes": 33,
+      "response_bytes": 87
+    },
+    {
+      "name": "r14.reg",
+      "request_bytes": 33,
+      "response_bytes": 87
+    },
+    {
+      "name": "00.00.eq.cmp",
+      "request_bytes": 38,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.eq.cmp",
+      "request_bytes": 38,
+      "response_bytes": 86
+    },
+    {
+      "name": "00.00.eq.cmp",
+      "request_bytes": 38,
+      "response_bytes": 86
+    },
+    {
+      "name": "01.0c.eq.cmp",
+      "request_bytes": 38,
+      "response_bytes": 86
+    },
+    {
+      "name": "lt.lt.cond",
+      "request_bytes": 36,
+      "response_bytes": 83
+    },
+    {
+      "name": "00.00.1.mux",
+      "request_bytes": 37,
+      "response_bytes": 85
+    },
+    {
+      "name": "01.01.1.mux",
+      "request_bytes": 37,
+      "response_bytes": 85
+    },
+    {
+      "name": "00.00.1.mux",
+      "request_bytes": 37,
+      "response_bytes": 85
+    },
+    {
+      "name": "5c.38.1.mux",
+      "request_bytes": 37,
+      "response_bytes": 85
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 86,
+      "response_bytes": 25
+    },
+    {
+      "name": "pc.reg",
+      "request_bytes": 32,
+      "response_bytes": 86
+    },
+    {
+      "name": "00010038.code",
+      "request_bytes": 39,
+      "response_bytes": 465
+    },
+    {
+      "name": "r15.reg",
+      "request_bytes": 33,
+      "response_bytes": 87
+    },
+    {
+      "name": "00.00.2.shl",
+      "request_bytes": 37,
+      "response_bytes": 85
+    },
+    {
+      "name": "00.00.2.shl",
+      "request_bytes": 37,
+      "response_bytes": 85
+    }
+  ],
+  "messages": [
+    "C on DNS: Fibonacci finished.\n"
+  ],
+  "results": [
+    0,
+    1,
+    1,
+    2,
+    3,
+    5,
+    8,
+    13,
+    21,
+    34,
+    55,
+    89
+  ],
+  "checkpoint_origin": null,
+  "elf_sha256": "3a7725151c05625ac1c522bc0d70725835b0d66194af0c91870b846dc5a1ac3d"
+}

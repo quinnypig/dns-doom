@@ -1,0 +1,27 @@
+zone compute.test/IN: loaded serial 1
+BIND 9.20.29-1~deb13u1-Debian (Stable Release) <id:>
+PASS: 511 inputs of length 0..8, parity computed by BIND
+Example: parity(1011)
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 31358
+;; flags: qr aa; QUERY: 1, ANSWER: 8, AUTHORITY: 1, ADDITIONAL: 2
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: 37bfcbe211f57cc0010000006ac03ee8e579e371cef333a1 (good)
+;; ANSWER SECTION:
+1.even.compute.test.	60	IN	DNAME	odd.compute.test.
+end.1.0.1.1.even.compute.test. 60 IN	CNAME	end.1.0.1.odd.compute.test.
+1.odd.compute.test.	60	IN	DNAME	even.compute.test.
+end.1.0.1.odd.compute.test. 60	IN	CNAME	end.1.0.even.compute.test.
+0.even.compute.test.	60	IN	DNAME	even.compute.test.
+end.1.0.even.compute.test. 60	IN	CNAME	end.1.even.compute.test.
+end.1.even.compute.test. 60	IN	CNAME	end.odd.compute.test.
+end.odd.compute.test.	60	IN	TXT	"1"
+
+
+Rewrite limit probe, 12 input bits: ;; ->>HEADER<<- opcode: QUERY, status: SERVFAIL, id: 20129
+Rewrite limit probe, 16 input bits: ;; ->>HEADER<<- opcode: QUERY, status: SERVFAIL, id: 51214
+Rewrite limit probe, 20 input bits: ;; ->>HEADER<<- opcode: QUERY, status: SERVFAIL, id: 41738
+Rewrite limit probe, 32 input bits: ;; ->>HEADER<<- opcode: QUERY, status: SERVFAIL, id: 13651
+Rewrite limit probe, 64 input bits: ;; ->>HEADER<<- opcode: QUERY, status: SERVFAIL, id: 61873

@@ -1,0 +1,16 @@
+[Unit]
+Description=Permanent Cloudflare Tunnel for DNS Doom
+Wants=dnsdoom.service
+After=dnsdoom.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+ExecStart=%h/.local/lib/dnsdoom/cloudflared tunnel --no-autoupdate run --token-file %h/.config/dnsdoom/tunnel.token
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+UMask=0077
+
+[Install]
+WantedBy=default.target

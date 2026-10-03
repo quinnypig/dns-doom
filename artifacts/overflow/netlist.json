@@ -1,0 +1,995 @@
+{
+  "name": "DNS-1",
+  "state_inputs": [
+    "p0",
+    "p1",
+    "p2",
+    "p3",
+    "a0",
+    "a1",
+    "a2",
+    "a3",
+    "halted"
+  ],
+  "instruction_inputs": [
+    "op0",
+    "op1",
+    "i0",
+    "i1",
+    "i2",
+    "i3"
+  ],
+  "gates": [
+    {
+      "out": "g000",
+      "a": "op1",
+      "b": "op1",
+      "stage": "decode"
+    },
+    {
+      "out": "g001",
+      "a": "op0",
+      "b": "op0",
+      "stage": "decode"
+    },
+    {
+      "out": "g002",
+      "a": "g000",
+      "b": "g001",
+      "stage": "decode"
+    },
+    {
+      "out": "g003",
+      "a": "g002",
+      "b": "g002",
+      "stage": "decode"
+    },
+    {
+      "out": "g004",
+      "a": "g000",
+      "b": "op0",
+      "stage": "decode"
+    },
+    {
+      "out": "g005",
+      "a": "g004",
+      "b": "g004",
+      "stage": "decode"
+    },
+    {
+      "out": "g006",
+      "a": "op1",
+      "b": "g001",
+      "stage": "decode"
+    },
+    {
+      "out": "g007",
+      "a": "g006",
+      "b": "g006",
+      "stage": "decode"
+    },
+    {
+      "out": "g008",
+      "a": "op1",
+      "b": "op0",
+      "stage": "decode"
+    },
+    {
+      "out": "g009",
+      "a": "g008",
+      "b": "g008",
+      "stage": "decode"
+    },
+    {
+      "out": "g010",
+      "a": "a0",
+      "b": "i0",
+      "stage": "ALU"
+    },
+    {
+      "out": "g011",
+      "a": "a0",
+      "b": "g010",
+      "stage": "ALU"
+    },
+    {
+      "out": "g012",
+      "a": "i0",
+      "b": "g010",
+      "stage": "ALU"
+    },
+    {
+      "out": "g013",
+      "a": "g011",
+      "b": "g012",
+      "stage": "ALU"
+    },
+    {
+      "out": "g014",
+      "a": "g013",
+      "b": "zero",
+      "stage": "ALU"
+    },
+    {
+      "out": "g015",
+      "a": "g013",
+      "b": "g014",
+      "stage": "ALU"
+    },
+    {
+      "out": "g016",
+      "a": "zero",
+      "b": "g014",
+      "stage": "ALU"
+    },
+    {
+      "out": "g017",
+      "a": "g015",
+      "b": "g016",
+      "stage": "ALU"
+    },
+    {
+      "out": "g018",
+      "a": "g010",
+      "b": "g014",
+      "stage": "ALU"
+    },
+    {
+      "out": "g019",
+      "a": "a1",
+      "b": "i1",
+      "stage": "ALU"
+    },
+    {
+      "out": "g020",
+      "a": "a1",
+      "b": "g019",
+      "stage": "ALU"
+    },
+    {
+      "out": "g021",
+      "a": "i1",
+      "b": "g019",
+      "stage": "ALU"
+    },
+    {
+      "out": "g022",
+      "a": "g020",
+      "b": "g021",
+      "stage": "ALU"
+    },
+    {
+      "out": "g023",
+      "a": "g022",
+      "b": "g018",
+      "stage": "ALU"
+    },
+    {
+      "out": "g024",
+      "a": "g022",
+      "b": "g023",
+      "stage": "ALU"
+    },
+    {
+      "out": "g025",
+      "a": "g018",
+      "b": "g023",
+      "stage": "ALU"
+    },
+    {
+      "out": "g026",
+      "a": "g024",
+      "b": "g025",
+      "stage": "ALU"
+    },
+    {
+      "out": "g027",
+      "a": "g019",
+      "b": "g023",
+      "stage": "ALU"
+    },
+    {
+      "out": "g028",
+      "a": "a2",
+      "b": "i2",
+      "stage": "ALU"
+    },
+    {
+      "out": "g029",
+      "a": "a2",
+      "b": "g028",
+      "stage": "ALU"
+    },
+    {
+      "out": "g030",
+      "a": "i2",
+      "b": "g028",
+      "stage": "ALU"
+    },
+    {
+      "out": "g031",
+      "a": "g029",
+      "b": "g030",
+      "stage": "ALU"
+    },
+    {
+      "out": "g032",
+      "a": "g031",
+      "b": "g027",
+      "stage": "ALU"
+    },
+    {
+      "out": "g033",
+      "a": "g031",
+      "b": "g032",
+      "stage": "ALU"
+    },
+    {
+      "out": "g034",
+      "a": "g027",
+      "b": "g032",
+      "stage": "ALU"
+    },
+    {
+      "out": "g035",
+      "a": "g033",
+      "b": "g034",
+      "stage": "ALU"
+    },
+    {
+      "out": "g036",
+      "a": "g028",
+      "b": "g032",
+      "stage": "ALU"
+    },
+    {
+      "out": "g037",
+      "a": "a3",
+      "b": "i3",
+      "stage": "ALU"
+    },
+    {
+      "out": "g038",
+      "a": "a3",
+      "b": "g037",
+      "stage": "ALU"
+    },
+    {
+      "out": "g039",
+      "a": "i3",
+      "b": "g037",
+      "stage": "ALU"
+    },
+    {
+      "out": "g040",
+      "a": "g038",
+      "b": "g039",
+      "stage": "ALU"
+    },
+    {
+      "out": "g041",
+      "a": "g040",
+      "b": "g036",
+      "stage": "ALU"
+    },
+    {
+      "out": "g042",
+      "a": "g040",
+      "b": "g041",
+      "stage": "ALU"
+    },
+    {
+      "out": "g043",
+      "a": "g036",
+      "b": "g041",
+      "stage": "ALU"
+    },
+    {
+      "out": "g044",
+      "a": "g042",
+      "b": "g043",
+      "stage": "ALU"
+    },
+    {
+      "out": "g045",
+      "a": "g037",
+      "b": "g041",
+      "stage": "ALU"
+    },
+    {
+      "out": "g046",
+      "a": "g003",
+      "b": "g003",
+      "stage": "ALU"
+    },
+    {
+      "out": "g047",
+      "a": "a0",
+      "b": "g046",
+      "stage": "ALU"
+    },
+    {
+      "out": "g048",
+      "a": "i0",
+      "b": "g003",
+      "stage": "ALU"
+    },
+    {
+      "out": "g049",
+      "a": "g047",
+      "b": "g048",
+      "stage": "ALU"
+    },
+    {
+      "out": "g050",
+      "a": "a1",
+      "b": "g046",
+      "stage": "ALU"
+    },
+    {
+      "out": "g051",
+      "a": "i1",
+      "b": "g003",
+      "stage": "ALU"
+    },
+    {
+      "out": "g052",
+      "a": "g050",
+      "b": "g051",
+      "stage": "ALU"
+    },
+    {
+      "out": "g053",
+      "a": "a2",
+      "b": "g046",
+      "stage": "ALU"
+    },
+    {
+      "out": "g054",
+      "a": "i2",
+      "b": "g003",
+      "stage": "ALU"
+    },
+    {
+      "out": "g055",
+      "a": "g053",
+      "b": "g054",
+      "stage": "ALU"
+    },
+    {
+      "out": "g056",
+      "a": "a3",
+      "b": "g046",
+      "stage": "ALU"
+    },
+    {
+      "out": "g057",
+      "a": "i3",
+      "b": "g003",
+      "stage": "ALU"
+    },
+    {
+      "out": "g058",
+      "a": "g056",
+      "b": "g057",
+      "stage": "ALU"
+    },
+    {
+      "out": "g059",
+      "a": "g005",
+      "b": "g005",
+      "stage": "ALU"
+    },
+    {
+      "out": "g060",
+      "a": "g049",
+      "b": "g059",
+      "stage": "ALU"
+    },
+    {
+      "out": "g061",
+      "a": "g017",
+      "b": "g005",
+      "stage": "ALU"
+    },
+    {
+      "out": "g062",
+      "a": "g060",
+      "b": "g061",
+      "stage": "ALU"
+    },
+    {
+      "out": "g063",
+      "a": "g052",
+      "b": "g059",
+      "stage": "ALU"
+    },
+    {
+      "out": "g064",
+      "a": "g026",
+      "b": "g005",
+      "stage": "ALU"
+    },
+    {
+      "out": "g065",
+      "a": "g063",
+      "b": "g064",
+      "stage": "ALU"
+    },
+    {
+      "out": "g066",
+      "a": "g055",
+      "b": "g059",
+      "stage": "ALU"
+    },
+    {
+      "out": "g067",
+      "a": "g035",
+      "b": "g005",
+      "stage": "ALU"
+    },
+    {
+      "out": "g068",
+      "a": "g066",
+      "b": "g067",
+      "stage": "ALU"
+    },
+    {
+      "out": "g069",
+      "a": "g058",
+      "b": "g059",
+      "stage": "ALU"
+    },
+    {
+      "out": "g070",
+      "a": "g044",
+      "b": "g005",
+      "stage": "ALU"
+    },
+    {
+      "out": "g071",
+      "a": "g069",
+      "b": "g070",
+      "stage": "ALU"
+    },
+    {
+      "out": "g072",
+      "a": "a0",
+      "b": "a0",
+      "stage": "branch"
+    },
+    {
+      "out": "g073",
+      "a": "a1",
+      "b": "a1",
+      "stage": "branch"
+    },
+    {
+      "out": "g074",
+      "a": "g072",
+      "b": "g073",
+      "stage": "branch"
+    },
+    {
+      "out": "g075",
+      "a": "a2",
+      "b": "a2",
+      "stage": "branch"
+    },
+    {
+      "out": "g076",
+      "a": "a3",
+      "b": "a3",
+      "stage": "branch"
+    },
+    {
+      "out": "g077",
+      "a": "g075",
+      "b": "g076",
+      "stage": "branch"
+    },
+    {
+      "out": "g078",
+      "a": "g074",
+      "b": "g074",
+      "stage": "branch"
+    },
+    {
+      "out": "g079",
+      "a": "g077",
+      "b": "g077",
+      "stage": "branch"
+    },
+    {
+      "out": "g080",
+      "a": "g078",
+      "b": "g079",
+      "stage": "branch"
+    },
+    {
+      "out": "g081",
+      "a": "g007",
+      "b": "g080",
+      "stage": "branch"
+    },
+    {
+      "out": "g082",
+      "a": "g081",
+      "b": "g081",
+      "stage": "branch"
+    },
+    {
+      "out": "g083",
+      "a": "p0",
+      "b": "one",
+      "stage": "branch"
+    },
+    {
+      "out": "g084",
+      "a": "p0",
+      "b": "g083",
+      "stage": "branch"
+    },
+    {
+      "out": "g085",
+      "a": "one",
+      "b": "g083",
+      "stage": "branch"
+    },
+    {
+      "out": "g086",
+      "a": "g084",
+      "b": "g085",
+      "stage": "branch"
+    },
+    {
+      "out": "g087",
+      "a": "g086",
+      "b": "zero",
+      "stage": "branch"
+    },
+    {
+      "out": "g088",
+      "a": "g086",
+      "b": "g087",
+      "stage": "branch"
+    },
+    {
+      "out": "g089",
+      "a": "zero",
+      "b": "g087",
+      "stage": "branch"
+    },
+    {
+      "out": "g090",
+      "a": "g088",
+      "b": "g089",
+      "stage": "branch"
+    },
+    {
+      "out": "g091",
+      "a": "g083",
+      "b": "g087",
+      "stage": "branch"
+    },
+    {
+      "out": "g092",
+      "a": "p1",
+      "b": "zero",
+      "stage": "branch"
+    },
+    {
+      "out": "g093",
+      "a": "p1",
+      "b": "g092",
+      "stage": "branch"
+    },
+    {
+      "out": "g094",
+      "a": "zero",
+      "b": "g092",
+      "stage": "branch"
+    },
+    {
+      "out": "g095",
+      "a": "g093",
+      "b": "g094",
+      "stage": "branch"
+    },
+    {
+      "out": "g096",
+      "a": "g095",
+      "b": "g091",
+      "stage": "branch"
+    },
+    {
+      "out": "g097",
+      "a": "g095",
+      "b": "g096",
+      "stage": "branch"
+    },
+    {
+      "out": "g098",
+      "a": "g091",
+      "b": "g096",
+      "stage": "branch"
+    },
+    {
+      "out": "g099",
+      "a": "g097",
+      "b": "g098",
+      "stage": "branch"
+    },
+    {
+      "out": "g100",
+      "a": "g092",
+      "b": "g096",
+      "stage": "branch"
+    },
+    {
+      "out": "g101",
+      "a": "p2",
+      "b": "zero",
+      "stage": "branch"
+    },
+    {
+      "out": "g102",
+      "a": "p2",
+      "b": "g101",
+      "stage": "branch"
+    },
+    {
+      "out": "g103",
+      "a": "zero",
+      "b": "g101",
+      "stage": "branch"
+    },
+    {
+      "out": "g104",
+      "a": "g102",
+      "b": "g103",
+      "stage": "branch"
+    },
+    {
+      "out": "g105",
+      "a": "g104",
+      "b": "g100",
+      "stage": "branch"
+    },
+    {
+      "out": "g106",
+      "a": "g104",
+      "b": "g105",
+      "stage": "branch"
+    },
+    {
+      "out": "g107",
+      "a": "g100",
+      "b": "g105",
+      "stage": "branch"
+    },
+    {
+      "out": "g108",
+      "a": "g106",
+      "b": "g107",
+      "stage": "branch"
+    },
+    {
+      "out": "g109",
+      "a": "g101",
+      "b": "g105",
+      "stage": "branch"
+    },
+    {
+      "out": "g110",
+      "a": "p3",
+      "b": "zero",
+      "stage": "branch"
+    },
+    {
+      "out": "g111",
+      "a": "p3",
+      "b": "g110",
+      "stage": "branch"
+    },
+    {
+      "out": "g112",
+      "a": "zero",
+      "b": "g110",
+      "stage": "branch"
+    },
+    {
+      "out": "g113",
+      "a": "g111",
+      "b": "g112",
+      "stage": "branch"
+    },
+    {
+      "out": "g114",
+      "a": "g113",
+      "b": "g109",
+      "stage": "branch"
+    },
+    {
+      "out": "g115",
+      "a": "g113",
+      "b": "g114",
+      "stage": "branch"
+    },
+    {
+      "out": "g116",
+      "a": "g109",
+      "b": "g114",
+      "stage": "branch"
+    },
+    {
+      "out": "g117",
+      "a": "g115",
+      "b": "g116",
+      "stage": "branch"
+    },
+    {
+      "out": "g118",
+      "a": "g110",
+      "b": "g114",
+      "stage": "branch"
+    },
+    {
+      "out": "g119",
+      "a": "g082",
+      "b": "g082",
+      "stage": "branch"
+    },
+    {
+      "out": "g120",
+      "a": "g090",
+      "b": "g119",
+      "stage": "branch"
+    },
+    {
+      "out": "g121",
+      "a": "i0",
+      "b": "g082",
+      "stage": "branch"
+    },
+    {
+      "out": "g122",
+      "a": "g120",
+      "b": "g121",
+      "stage": "branch"
+    },
+    {
+      "out": "g123",
+      "a": "g099",
+      "b": "g119",
+      "stage": "branch"
+    },
+    {
+      "out": "g124",
+      "a": "i1",
+      "b": "g082",
+      "stage": "branch"
+    },
+    {
+      "out": "g125",
+      "a": "g123",
+      "b": "g124",
+      "stage": "branch"
+    },
+    {
+      "out": "g126",
+      "a": "g108",
+      "b": "g119",
+      "stage": "branch"
+    },
+    {
+      "out": "g127",
+      "a": "i2",
+      "b": "g082",
+      "stage": "branch"
+    },
+    {
+      "out": "g128",
+      "a": "g126",
+      "b": "g127",
+      "stage": "branch"
+    },
+    {
+      "out": "g129",
+      "a": "g117",
+      "b": "g119",
+      "stage": "branch"
+    },
+    {
+      "out": "g130",
+      "a": "i3",
+      "b": "g082",
+      "stage": "branch"
+    },
+    {
+      "out": "g131",
+      "a": "g129",
+      "b": "g130",
+      "stage": "branch"
+    },
+    {
+      "out": "g132",
+      "a": "halted",
+      "b": "halted",
+      "stage": "latch"
+    },
+    {
+      "out": "g133",
+      "a": "g009",
+      "b": "g009",
+      "stage": "latch"
+    },
+    {
+      "out": "g134",
+      "a": "g132",
+      "b": "g133",
+      "stage": "latch"
+    },
+    {
+      "out": "g135",
+      "a": "g134",
+      "b": "g134",
+      "stage": "latch"
+    },
+    {
+      "out": "g136",
+      "a": "g122",
+      "b": "g135",
+      "stage": "latch"
+    },
+    {
+      "out": "g137",
+      "a": "p0",
+      "b": "g134",
+      "stage": "latch"
+    },
+    {
+      "out": "g138",
+      "a": "g136",
+      "b": "g137",
+      "stage": "latch"
+    },
+    {
+      "out": "g139",
+      "a": "g125",
+      "b": "g135",
+      "stage": "latch"
+    },
+    {
+      "out": "g140",
+      "a": "p1",
+      "b": "g134",
+      "stage": "latch"
+    },
+    {
+      "out": "g141",
+      "a": "g139",
+      "b": "g140",
+      "stage": "latch"
+    },
+    {
+      "out": "g142",
+      "a": "g128",
+      "b": "g135",
+      "stage": "latch"
+    },
+    {
+      "out": "g143",
+      "a": "p2",
+      "b": "g134",
+      "stage": "latch"
+    },
+    {
+      "out": "g144",
+      "a": "g142",
+      "b": "g143",
+      "stage": "latch"
+    },
+    {
+      "out": "g145",
+      "a": "g131",
+      "b": "g135",
+      "stage": "latch"
+    },
+    {
+      "out": "g146",
+      "a": "p3",
+      "b": "g134",
+      "stage": "latch"
+    },
+    {
+      "out": "g147",
+      "a": "g145",
+      "b": "g146",
+      "stage": "latch"
+    },
+    {
+      "out": "g148",
+      "a": "g062",
+      "b": "g132",
+      "stage": "latch"
+    },
+    {
+      "out": "g149",
+      "a": "a0",
+      "b": "halted",
+      "stage": "latch"
+    },
+    {
+      "out": "g150",
+      "a": "g148",
+      "b": "g149",
+      "stage": "latch"
+    },
+    {
+      "out": "g151",
+      "a": "g065",
+      "b": "g132",
+      "stage": "latch"
+    },
+    {
+      "out": "g152",
+      "a": "a1",
+      "b": "halted",
+      "stage": "latch"
+    },
+    {
+      "out": "g153",
+      "a": "g151",
+      "b": "g152",
+      "stage": "latch"
+    },
+    {
+      "out": "g154",
+      "a": "g068",
+      "b": "g132",
+      "stage": "latch"
+    },
+    {
+      "out": "g155",
+      "a": "a2",
+      "b": "halted",
+      "stage": "latch"
+    },
+    {
+      "out": "g156",
+      "a": "g154",
+      "b": "g155",
+      "stage": "latch"
+    },
+    {
+      "out": "g157",
+      "a": "g071",
+      "b": "g132",
+      "stage": "latch"
+    },
+    {
+      "out": "g158",
+      "a": "a3",
+      "b": "halted",
+      "stage": "latch"
+    },
+    {
+      "out": "g159",
+      "a": "g157",
+      "b": "g158",
+      "stage": "latch"
+    }
+  ],
+  "state_outputs": [
+    "g138",
+    "g141",
+    "g144",
+    "g147",
+    "g150",
+    "g153",
+    "g156",
+    "g159",
+    "g134"
+  ]
+}

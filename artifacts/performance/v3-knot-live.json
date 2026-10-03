@@ -1,0 +1,11 @@
+{
+  "live_instruction_cases": 80,
+  "dns_transactions": 3928,
+  "fault_injection": "passed",
+  "server": "knot",
+  "native": true,
+  "optimized": true,
+  "packed": true,
+  "stale_update": "rejected",
+  "packed_state_prerequisite": "DNS rejected stale registers with unchanged PC"
+}

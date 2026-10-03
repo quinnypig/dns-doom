@@ -1,0 +1,19 @@
+[Unit]
+Description=Doom computed through DNS - web demo
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+WorkingDirectory=%h/src/dns-doom
+EnvironmentFile=%h/.config/dnsdoom/service.env
+Environment=PYTHONUNBUFFERED=1
+ExecStartPre=/usr/bin/python3 %h/src/dns-doom/deploy/cleanup.py
+ExecStart=/usr/bin/python3 -m dns32.demo --host 127.0.0.1 --port 8770 --last-run artifacts/live/278dc76d75
+ExecStopPost=/usr/bin/python3 %h/src/dns-doom/deploy/cleanup.py
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+UMask=0077
+
+[Install]
+WantedBy=default.target
