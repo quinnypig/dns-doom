@@ -19,9 +19,10 @@ locally; the next game update and fresh rendering happen through DNS.
 ./run-rv32.sh test        # differential tests and live DNS fault checks
 ```
 
-The browser offers a quick Fibonacci run, a full Doom tick, live progress,
-framebuffer previews, cancellation, and comparison evidence. Doom takes a few
-minutes plus zone preparation; this is a computation demo, not interactive play.
+The browser page shows the Doom frame, live progress, and the verified result
+of one game tick. An operator with the interactive key can start or stop a run.
+Doom takes a few minutes plus zone preparation; this is a computation demo, not
+interactive play. The Fibonacci program remains available from the CLI.
 Requires Docker, Bash, Python 3 for the web server, and several GB of free RAM.
 
 See [DNS32.md](DNS32.md) for the architecture and [PERFORMANCE.md](PERFORMANCE.md)

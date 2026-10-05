@@ -84,3 +84,11 @@ class AccessTests(unittest.TestCase):
         from unittest.mock import patch
         with patch.object(demo,'ACCESS_TOKEN',''):
             self.assertEqual(self.request('/api/run','POST')[0],403)
+
+class PageScriptTests(unittest.TestCase):
+    def test_browser_page_script_regressions(self):
+        import shutil,subprocess
+        node=shutil.which('node')
+        if not node:self.skipTest('node is not installed; run `node --test tests/demo_page.test.mjs` where it is')
+        result=subprocess.run([node,'--test',str(Path(__file__).with_name('demo_page.test.mjs'))],capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stdout+result.stderr)
