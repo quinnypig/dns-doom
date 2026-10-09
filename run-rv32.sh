@@ -23,7 +23,7 @@ case "$mode" in
             artifacts/rv32/doom-small.elf --checkpoint D_DoomLoop --checkpoint-hit 2 \
             --output artifacts/tick-checkpoint
         flags=()
-        if [ "$mode" = fast ]; then flags=(--client native --pipeline --optimize --packed --blocks); fi
+        if [ "$mode" = fast ]; then flags=(--client native --pipeline --optimize --packed --blocks --sequencer native); fi
         "${container[@]}" dns32:local artifacts/rv32/doom-small.elf \
             --checkpoint artifacts/tick-checkpoint --steps 3000000 --seconds 1800 \
             --output artifacts/dns32-tick "${flags[@]}" "$@" ;;
@@ -31,6 +31,7 @@ case "$mode" in
         "${container[@]}" --entrypoint python dns32:local -m unittest discover -s tests
         "${container[@]}" --entrypoint python dns32:local -m dns32.verify_live
         "${container[@]}" --entrypoint python dns32:local -m dns32.verify_live --native --optimized --packed --server bind --output artifacts/performance/bind-live.json
+        "${container[@]}" --entrypoint python dns32:local -m dns32.verify_live --native --optimized --packed --server bind --sequencer native --output artifacts/performance/bind-live-native.json
         "${container[@]}" --entrypoint python dns32:local -m dns32.verify_live --native --optimized --packed --server knot --output artifacts/performance/knot-live.json ;;
     *) echo "Usage: $0 {fibonacci|cold|tick|fast|test} [runtime arguments]" >&2; exit 2 ;;
 esac

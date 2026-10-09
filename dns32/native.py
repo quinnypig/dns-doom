@@ -56,3 +56,40 @@ class NativeBus(Bus):
         query=wire.query(self.next_id(),name)
         replies=self.exchange_many([update,query],['UPDATE',name],lenient=(1,))
         return None if replies[1] is None else wire.parse_txt(replies[1])
+
+
+def compile_native(raw):
+    """Decode one plan text into the native structure. Wire names become indices; wire 0 is the state."""
+    from .optimized import schedule
+    plan,stages=schedule(raw)
+    index={'_state':0}
+    def wire_of(n):return index.setdefault(n,len(index))
+    def part(p):return p if isinstance(p,str) else (wire_of(p[0]),-1 if len(p)==1 else p[1],-1 if len(p)==1 else p[2])
+    out_stages=[([(wire_of(o),[part(p) for p in parts]) for _,o,parts in copies],
+                 [(wire_of(o),[part(p) for p in parts]) for _,o,parts in queries]) for copies,queries in stages]
+    writes=[([part(p) for p in n],[part(p) for p in v]) for n,v in plan['writes']]
+    state_write=next(i for i,(n,_) in enumerate(plan['writes']) if n==['state.reg'])
+    skips=[(wire_of(c),length) for c,_,length in plan.get('skips',())]
+    return plan,wire.compile_plan(out_stages,writes,skips,len(index),state_write)
+
+
+class NativeSequencer:
+    """Runs packed block plans with the C++ wiring loop.
+
+    Only wire shuffling moves to C++: slicing, concatenation, DNS message framing.
+    Each plan text is decoded once; the plan itself is still fetched from DNS at
+    every clock, and every arithmetic answer is a DNS response.
+    """
+    def __init__(self,bus):
+        self.bus=bus;self.compiled={}
+
+    def step(self,state,raw):
+        entry=self.compiled.get(raw)
+        if entry is None:entry=self.compiled[raw]=compile_native(raw)
+        plan,capsule=entry
+        bus=self.bus
+        new_state,next_raw,skipped,transactions,payload,trips,bus.sequence,samples=wire.run(
+            bus.socket.fileno(),capsule,state,bus.sequence,max(0,bus.sample_limit-len(bus.samples)))
+        bus.transactions+=transactions;bus.payload_bytes+=payload;bus.round_trips+=trips
+        bus.samples.extend({'name':n,'request_bytes':a,'response_bytes':b} for n,a,b in samples)
+        return plan,new_state,next_raw,skipped

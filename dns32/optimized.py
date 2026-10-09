@@ -99,6 +99,23 @@ def step(bus,io=None,pipeline=True,packed=False):
     return pc,plan['label']
 
 
+def step_native(bus,sequencer,io=None):
+    """Packed block step whose wiring loop runs in the native extension."""
+    state=getattr(bus,'cached_state',None)
+    if state is None:state=bus.txt('state.reg')
+    pc=state[:8]
+    raw=getattr(bus,'prefetched_plan',None)
+    if raw is None or getattr(bus,'prefetched_pc',None)!=pc:raw=bus.txt(pc+'.code')
+    plan,new_state,next_raw,skipped=sequencer.step(state,raw)
+    bus.cached_state=new_state;bus.prefetched_plan=next_raw;bus.prefetched_pc=bus.last_pc=new_state[:8]
+    wires={s[0]:('1' if hit else '0') for s,hit in zip(plan.get('skips',()),skipped)}
+    account(bus,plan,wires)
+    if plan['trap']:
+        if io is None:raise RuntimeError('ECALL without I/O')
+        io.trap(bus)
+    return pc,plan['label']
+
+
 class PackedRegisters:
     """Peripheral/readback adapter; register slicing is fixed physical wiring."""
     def __init__(self,bus):self.bus=bus

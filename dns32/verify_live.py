@@ -11,7 +11,7 @@ from .server import Server
 
 def main():
     import argparse
-    p=argparse.ArgumentParser();p.add_argument('--server',default='bind');p.add_argument('--native',action='store_true');p.add_argument('--optimized',action='store_true');p.add_argument('--packed',action='store_true');p.add_argument('--output',default='artifacts/dns32-live-tests.json');args=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--server',default='bind');p.add_argument('--native',action='store_true');p.add_argument('--optimized',action='store_true');p.add_argument('--packed',action='store_true');p.add_argument('--sequencer',default='python',choices=['python','native']);p.add_argument('--output',default='artifacts/dns32-live-tests.json');args=p.parse_args()
     if args.native:
         from .native import NativeBus
         bus_class=NativeBus
@@ -44,6 +44,11 @@ def main():
     with Server(image,tables_path="artifacts/rv32/tables-v4.zone" if args.optimized else "artifacts/rv32/tables.zone",backend=args.server):
         bus=bus_class()
         if args.packed:bus=PackedRegisters(bus)
+        if args.sequencer=='native':
+            from .native import NativeSequencer
+            from .optimized import step_native
+            sequencer=NativeSequencer(bus.bus)
+            execute=lambda b:step_native(b,sequencer)
         for i,(ins,a,b) in enumerate(cases):
             pc=0x1000+i*4
             oracle=Reference({"entry":pc,"memory":memory})
@@ -67,7 +72,7 @@ def main():
         try:bus.commit([('pc.reg','00000000')],'deadbeef')
         except RuntimeError:pass
         else:raise AssertionError('Stale update was accepted')
-        report.update(server=args.server,native=args.native,optimized=args.optimized,packed=args.packed,stale_update='rejected')
+        report.update(server=args.server,native=args.native,optimized=args.optimized,packed=args.packed,sequencer=args.sequencer,stale_update='rejected')
         if args.packed:
             before=bus.txt('state.reg')
             bus.commit([('r31.reg','12345678')])

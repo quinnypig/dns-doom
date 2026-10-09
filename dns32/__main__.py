@@ -27,6 +27,7 @@ def main():
     parser.add_argument("--optimize",action="store_true")
     parser.add_argument("--packed",action="store_true")
     parser.add_argument("--blocks",action="store_true",help="Fuse straight-line instructions between state commits")
+    parser.add_argument("--sequencer",choices=("python","native"),default="python",help="Where the wiring loop runs; native requires --client native --packed --blocks")
     parser.add_argument("--preview",type=float,default=0,help="Seconds between DNS framebuffer previews (0 disables)")
     args=parser.parse_args()
     out=Path(args.output);out.mkdir(parents=True,exist_ok=True)
@@ -34,6 +35,7 @@ def main():
         (out/name).unlink(missing_ok=True)
     if (args.pipeline or args.packed) and args.client!='native':parser.error('Pipelining/packing requires --client native')
     if args.blocks and not (args.optimize and args.packed):parser.error('--blocks requires --optimize --packed')
+    if args.sequencer=='native' and not (args.client=='native' and args.packed and args.blocks):parser.error('--sequencer native requires --client native --packed --blocks')
     args.tables=args.tables or ('artifacts/rv32/tables-v4.zone' if args.optimize else 'artifacts/rv32/tables.zone')
     image=load_elf(args.elf,optimize=args.optimize)
     if Path(args.elf).resolve()!=(out/"program.elf").resolve():
@@ -67,7 +69,12 @@ def main():
         if args.packed:
             from .optimized import PackedRegisters
             bus=PackedRegisters(bus)
-        if args.pipeline or args.optimize or args.packed:
+        if args.sequencer=='native':
+            from .native import NativeSequencer
+            from .optimized import step_native
+            sequencer=NativeSequencer(bus.bus)
+            execute=lambda:step_native(bus,sequencer,io)
+        elif args.pipeline or args.optimize or args.packed:
             from .optimized import step as optimized_step
             execute=lambda:optimized_step(bus,io,args.pipeline,args.packed)
         else:execute=lambda:step(bus,io)
@@ -136,7 +143,7 @@ def main():
             report["checkpoint_origin"]=checkpoint["origin"] if checkpoint else None
             report["elf_sha256"]=image["sha256"]
             report["client"]=args.client
-            report["optimization"]={"pipeline":args.pipeline,"packed":args.packed,"wiring":args.optimize,"blocks":args.blocks}
+            report["optimization"]={"pipeline":args.pipeline,"packed":args.packed,"wiring":args.optimize,"blocks":args.blocks,"sequencer":args.sequencer}
             report['wiring_revision']=4 if args.optimize else 1
             report["clock_cycles"]=cycles
             report["preview_interval"]=args.preview
