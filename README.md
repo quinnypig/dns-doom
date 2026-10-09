@@ -7,8 +7,8 @@ See [CI/CD and operations](deploy/README.md).
 # Doom on DNS: the domain name computer
 
 **The live demo renders a verified Doom game tick through stock DNS.**
-The latest run executed 1,389,327 RISC-V instructions and 8,206,070 DNS
-transactions in **146.28 seconds**, about four times faster than the original.
+The latest run executed 1,389,327 RISC-V instructions and 6,962,678 DNS
+transactions in **55.63 seconds**, about ten times faster than the original.
 All 4,608 pixels, 32 registers, the PC, and checked game state match an
 independent emulator. This is a checkpoint demo: scene initialization happens
 locally; the next game update and fresh rendering happen through DNS.
@@ -21,7 +21,7 @@ locally; the next game update and fresh rendering happen through DNS.
 
 The browser page shows the Doom frame, live progress, and the verified result
 of one game tick. An operator with the interactive key can start or stop a run.
-Doom takes a few minutes plus zone preparation; this is a computation demo, not
+Doom takes about a minute plus zone preparation; this is a computation demo, not
 interactive play. The Fibonacci program remains available from the CLI.
 Requires Docker, Bash, Python 3 for the web server, and several GB of free RAM.
 

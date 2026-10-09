@@ -15,9 +15,9 @@ Open [the standalone evidence page](artifacts/dns32-tick/index.html),
 [the DNS run report](artifacts/dns32-tick/run.json), or
 [the comparison results](artifacts/dns32-tick/verification.json).
 
-**Optimized result:** the same tick now takes **146.28 seconds**, with
-8,206,070 DNS transactions and 507,332 block clocks. The same pixel and machine
-state checks pass. [Latest report](artifacts/live/278dc76d75/run.json).
+**Optimized result:** the same tick now takes **55.63 seconds**, with
+6,962,678 DNS transactions, 1,854,410 round trips, and 284,757 block clocks. The
+same pixel and machine state checks pass.
 See [PERFORMANCE.md](PERFORMANCE.md) for controlled benchmarks and tradeoffs.
 The instruction-by-instruction architecture below describes the baseline;
 optimized mode batches wiring and packs architectural state as described there.

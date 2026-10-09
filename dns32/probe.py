@@ -56,4 +56,26 @@ def main():
         print(f'udp 64 x{threads:<4d}   {e:.3f}s  {1e6*e/len(names):6.2f} us/query',flush=True)
         bus.close()
 
-if __name__=='__main__':main()
+if __name__=='__main__' and not (len(sys.argv)>1 and sys.argv[1]=='plans'):main()
+
+def plans():
+    """Task 7 measurement: does fetching a 2-3 KB plan record cost more than a small answer?"""
+    import json
+    from .checkpoint import restore
+    from .blocks import compile_blocks
+    from .optimized import pack_plan
+    image=load_elf('artifacts/tick-checkpoint/program.elf',optimize=True);restore(image,'artifacts/tick-checkpoint')
+    compile_blocks(image);image['packed']=True;image['code']={pc:pack_plan(p) for pc,p in image['code'].items()}
+    sizes=sorted(len(json.dumps(p,separators=(',',':'))) for p in image['code'].values())
+    print(f'plan bytes: median {sizes[len(sizes)//2]}, p90 {sizes[int(len(sizes)*.9)]}, max {sizes[-1]}',flush=True)
+    rng=random.Random(2);codes=[f'{pc:08x}.code' for pc in rng.sample(sorted(image['code']),5000)]
+    small=[f'{rng.randrange(256):02x}.{rng.randrange(256):02x}.0.add' for _ in range(5000)]
+    with Server(image,tables_path='artifacts/rv32/tables-v4.zone'):
+        bus=NativeBus()
+        for label,names in (('small answer',small),('plan fetch',codes),('small answer',small),('plan fetch',codes)):
+            t=time.perf_counter()
+            for n in names:bus.txt(n)
+            e=time.perf_counter()-t;print(f'{label:13s} {1e6*e/len(names):6.2f} us/trip',flush=True)
+        bus.close()
+
+if __name__=='__main__' and len(sys.argv)>1 and sys.argv[1]=='plans':plans()
