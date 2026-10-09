@@ -8,6 +8,13 @@ def lookup(name):
         value, cond = parts[:2]
         return str(int({"eq":value == "eq", "ne":value != "eq",
                         "lt":value == "lt", "ge":value != "lt"}[cond]))
+    if op == "cla":
+        bits=parts[0];g=[int(bits[i]) for i in (6,4,2,0)];p=[int(bits[i]) for i in (7,5,3,1)]   # byte0 first
+        c=[0]
+        for i in range(3):c.append(g[i] | (p[i] & c[i]))
+        return "".join(str(x) for x in reversed(c))          # c3c2c1c0
+    if op == "cmp4":
+        return next((v for v in parts[:4] if v != "eq"), "eq")
     a = int(parts[0],16)
     if op in ('inc16','dec16'):
         return f"{(a+int(parts[1])*(1 if op=='inc16' else -1))&65535:04x}"
@@ -19,6 +26,10 @@ def lookup(name):
     if op == "clearlsb": return f"{a & 254:02x}"
     if op == "shiftbits": return f"{a & 31:05b}"[::-1]
     b = int(parts[1],16)
+    if op in ("addgp","subgp"):
+        if op == "addgp":s0,s1,g,p=(a+b)&255,(a+b+1)&255,int(a+b>255),int((a+b)&255==255)
+        else:s0,s1,g,p=(a-b)&255,(a-b-1)&255,int(a<b),int(a==b)
+        return f"{s0:02x}{s1:02x}{g}{p}"
     if op in ("add","sub"):
         c = int(parts[2])
         result = a+b+c if op == "add" else a-b-c
@@ -51,6 +62,13 @@ def records():
         for op in ('inc16','dec16'):
             for c in (0,1):
                 name=f'{a:04x}.{c}.{op}';yield name,lookup(name)
+    for bits in range(256):
+        name=f"{bits:08b}.cla";yield name,lookup(name)
+    for m in ("lt","eq","gt"):
+        for x in ("lt","eq","gt"):
+            for y in ("lt","eq","gt"):
+                for z in ("lt","eq","gt"):
+                    name=f"{m}.{x}.{y}.{z}.cmp4";yield name,lookup(name)
     for value in ("lt","eq","gt"):
         for cond in ("eq","ne","lt","ge"):
             name = f"{value}.{cond}.cond"
@@ -65,7 +83,7 @@ def records():
     for a in range(256):
         for b in range(256):
             base = f"{a:02x}.{b:02x}"
-            for op in ("and","or","xor"):
+            for op in ("and","or","xor","addgp","subgp"):
                 name = f"{base}.{op}"
                 yield name,lookup(name)
             for op in ("add","sub","mux"):

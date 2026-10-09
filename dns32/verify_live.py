@@ -41,7 +41,7 @@ def main():
     if args.packed:
         from .optimized import pack_plan,PackedRegisters
         image['packed']=True;image['code']={pc:pack_plan(v) for pc,v in code.items()}
-    with Server(image,tables_path="artifacts/rv32/tables-v3.zone" if args.optimized else "artifacts/rv32/tables.zone",backend=args.server):
+    with Server(image,tables_path="artifacts/rv32/tables-v4.zone" if args.optimized else "artifacts/rv32/tables.zone",backend=args.server):
         bus=bus_class()
         if args.packed:bus=PackedRegisters(bus)
         for i,(ins,a,b) in enumerate(cases):

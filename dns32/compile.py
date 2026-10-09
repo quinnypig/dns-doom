@@ -64,6 +64,13 @@ class Wiring:
                     low=self.query(self.cut(a,4,8),'.',word(offset),'.add16')
                     high=self.query(self.cut(a,0,4),'.',self.cut(low,4,5),'.inc16' if offset>0 else '.dec16')
                     return self.copy(high,self.cut(low,0,4))
+        if self.optimize and op in ("add","sub"):
+            # Carry lookahead: one stage of byte generate/propagate lookups, one carry-chain
+            # lookup, one stage of byte selection. Three dependent trips instead of four.
+            gp=[self.query(self.cut(a,o,o+2),".",self.cut(b,o,o+2),f".{op}gp") for o in (0,2,4,6)]   # byte3..byte0
+            carries=self.query(*[self.cut(x,4,6) for x in gp],".cla")                                  # g3p3..g0p0 -> c3c2c1c0
+            return self.copy(*[self.query(self.cut(x,0,2),".",self.cut(x,2,4),".",self.cut(carries,i,i+1),".mux")
+                               for i,x in enumerate(gp)])
         result = []
         carry = "0"
         for offset in (6, 4, 2, 0):
@@ -82,11 +89,15 @@ class Wiring:
         return self.copy(*reversed(result))
 
     def compare(self, a, b, signed=False):
-        state = "eq"
-        for offset in (0, 2, 4, 6):
-            state = self.query(self.cut(a,offset,offset+2), ".", self.cut(b,offset,offset+2),
-                               ".", state, ".", "scmp" if signed and offset == 0 else "cmp")
-        return state
+        if not self.optimize:
+            state = "eq"
+            for offset in (0, 2, 4, 6):
+                state = self.query(self.cut(a,offset,offset+2), ".", self.cut(b,offset,offset+2),
+                                   ".", state, ".", "scmp" if signed and offset == 0 else "cmp")
+            return state
+        # All four byte comparisons in one stage, then one lookup picks the most significant difference.
+        bytes_=[self.query(self.cut(a,o,o+2),".",self.cut(b,o,o+2),".eq.","scmp" if signed and o==0 else "cmp") for o in (0,2,4,6)]
+        return self.query(bytes_[0],".",bytes_[1],".",bytes_[2],".",bytes_[3],".cmp4")
 
     def condition(self, comparison, condition):
         return self.query(comparison, ".", condition, ".cond")
@@ -130,22 +141,18 @@ class Wiring:
             a = self.mux(self.cut(controls,index,index+1), a, self.shift_fixed(a,amount,kind))
         return a
 
-    def load(self, address, size, signed):
-        values = []
-        current = address
-        for index in range(size):
-            values.append(self.query(current, ".mem"))
-            if index + 1 < size:
-                current = self.alu("add", current, "00000001")
+    def address(self, base, offset, index):
+        # Every byte address is base plus one constant, so all of them share the same stages.
+        return self.alu("add", base, word(offset + index))
+
+    def load(self, base, offset, size, signed):
+        values = [self.query(self.address(base, offset, index), ".mem") for index in range(size)]
         fill = self.query(values[-1], ".sign") if signed and size < 4 else "00"
         return self.copy(*([fill] * (4-size)), *reversed(values))
 
-    def store(self, address, value, size):
-        current = address
+    def store(self, base, offset, value, size):
         for index in range(size):
-            self.writes.append([[current, ".mem"], [self.cut(value,6-index*2,8-index*2)]])
-            if index + 1 < size:
-                current = self.alu("add", current, "00000001")
+            self.writes.append([[self.address(base, offset, index), ".mem"], [self.cut(value,6-index*2,8-index*2)]])
 
 
 def compile_instruction(pc, ins,optimize=False):
@@ -178,12 +185,10 @@ def compile_instruction(pc, ins,optimize=False):
         next_pc = w.mux(w.condition(compared,condition), word(pc+4), word(pc+imm_b))
         label = {0:"BEQ",1:"BNE",4:"BLT",5:"BGE",6:"BLTU",7:"BGEU"}[f3]
     elif opcode == 0x03 and f3 in (0,1,2,4,5):
-        address = w.alu("add",w.reg(rs1),word(imm_i))
-        value = w.load(address, {0:1,1:2,2:4,4:1,5:2}[f3], signed=f3 in (0,1))
+        value = w.load(w.reg(rs1), imm_i, {0:1,1:2,2:4,4:1,5:2}[f3], signed=f3 in (0,1))
         label = {0:"LB",1:"LH",2:"LW",4:"LBU",5:"LHU"}[f3]
     elif opcode == 0x23 and f3 in (0,1,2):
-        address = w.alu("add",w.reg(rs1),word(imm_s))
-        w.store(address,w.reg(rs2),1 << f3)
+        w.store(w.reg(rs1),imm_s,w.reg(rs2),1 << f3)
         label = {0:"SB",1:"SH",2:"SW"}[f3]
     elif opcode in (0x13,0x33):
         a = w.reg(rs1)

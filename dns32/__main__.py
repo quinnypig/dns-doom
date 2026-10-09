@@ -34,7 +34,7 @@ def main():
         (out/name).unlink(missing_ok=True)
     if (args.pipeline or args.packed) and args.client!='native':parser.error('Pipelining/packing requires --client native')
     if args.blocks and not (args.optimize and args.packed):parser.error('--blocks requires --optimize --packed')
-    args.tables=args.tables or ('artifacts/rv32/tables-v3.zone' if args.optimize else 'artifacts/rv32/tables.zone')
+    args.tables=args.tables or ('artifacts/rv32/tables-v4.zone' if args.optimize else 'artifacts/rv32/tables.zone')
     image=load_elf(args.elf,optimize=args.optimize)
     if Path(args.elf).resolve()!=(out/"program.elf").resolve():
         shutil.copyfile(args.elf,out/"program.elf")
@@ -137,7 +137,7 @@ def main():
             report["elf_sha256"]=image["sha256"]
             report["client"]=args.client
             report["optimization"]={"pipeline":args.pipeline,"packed":args.packed,"wiring":args.optimize,"blocks":args.blocks}
-            report['wiring_revision']=3 if args.optimize else 1
+            report['wiring_revision']=4 if args.optimize else 1
             report["clock_cycles"]=cycles
             report["preview_interval"]=args.preview
             report["network_batches"]=getattr(bus,'round_trips',bus.transactions)

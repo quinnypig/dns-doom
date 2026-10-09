@@ -38,7 +38,7 @@ def main():
     if a.packed:
         from .optimized import pack_plan
         image['packed']=True;image['code']={pc:pack_plan(v) for pc,v in image['code'].items()}
-    with Server(image,tables_path='artifacts/rv32/tables-v3.zone',backend=a.server,log_path=out/'server.log'):
+    with Server(image,tables_path='artifacts/rv32/tables-v4.zone',backend=a.server,log_path=out/'server.log'):
         if a.native:
             from .native import NativeBus
             raw=NativeBus()
@@ -77,7 +77,7 @@ def main():
             for i in range(0,len(changes),200):raw.commit(changes[i:i+200])
             invalidate(bus)
         raw.close()
-    report={'configuration':vars(a),'runs':results,'wiring_revision':3,'median_seconds':statistics.median(r['seconds'] for r in results)}
+    report={'configuration':vars(a),'runs':results,'wiring_revision':4,'median_seconds':statistics.median(r['seconds'] for r in results)}
     (out/'benchmark.json').write_text(json.dumps(report,indent=2));print(json.dumps(report),flush=True)
 
 if __name__=='__main__':main()
