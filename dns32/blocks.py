@@ -5,7 +5,14 @@ queries DNS. Architectural state is committed at each block boundary.
 """
 from .compile import sx
 
-END={'JAL','JALR','BEQ','BNE','BLT','BGE','BLTU','BGEU','SB','SH','SW','ECALL','FENCE'}
+END={'JAL','JALR','BEQ','BNE','BLT','BGE','BLTU','BGEU','ECALL','FENCE'}
+STORES={'SB','SH','SW'};LOADS={'LB','LH','LW','LBU','LHU'}
+
+def cut_store_before_load(group):
+    """A store may stay inside a block only if no later instruction in it loads."""
+    for i,p in enumerate(group):
+        if p['label'] in STORES and any(q['label'] in LOADS for q in group[i+1:]):return group[:i+1]
+    return group
 
 def fuse(plans):
     steps=[];registers={};memory=[];pc_value=None;labels=[]
@@ -47,9 +54,11 @@ def compile_blocks(image,maximum=16,extra_leaders=()):
             if group and pc in leaders:break
             p=code[pc]
             if 'invalid' in p:break
-            group.append(p);covered.add(pc)
+            group.append(p)
             if p['label'] in END:break
             pc+=4
+        group=cut_store_before_load(group)
+        covered.update(start+4*i for i in range(len(group)))
         if len(group)>1:result[start]=fuse(group)
     # Every non-leader address retains its single-instruction plan. Indirect
     # branches into a block's middle therefore remain correct.
