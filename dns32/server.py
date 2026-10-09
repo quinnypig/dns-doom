@@ -1,6 +1,7 @@
 """Offline zone generation, then an unmodified BIND server."""
 
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -51,6 +52,7 @@ def prepare(root,image,tables_path=None):
  allow-query { 127.0.0.1; }; allow-transfer { none; };
  pid-file "%s/named.pid"; session-keyfile "%s/session.key";
  tcp-idle-timeout 1200; tcp-keepalive-timeout 1200;
+ %s
 };
 controls {};
 logging {
@@ -62,7 +64,7 @@ logging {
 };
 zone "rv.test" { type primary; file "machine.zone";
  allow-update { 127.0.0.1; }; notify no; };
-'''%(root.resolve(),root.resolve(),root.resolve()))
+'''%(root.resolve(),root.resolve(),root.resolve(),os.environ.get('DNS32_NAMED_OPTIONS','')))
 
 
 class Server:
@@ -107,7 +109,7 @@ zone:
         self.log=self.log_path.open("w")
         # -g overrides configured logging; -f stays foreground and honors it.
         command=(["knotd","-c",str(self.root/"knot.conf")] if self.backend=="knot" else
-                 ["named","-f","-n","1","-c",str(self.root/"named.conf")])
+                 ["named","-f","-n",os.environ.get("DNS32_NAMED_THREADS","1"),"-c",str(self.root/"named.conf")])
         self.process=subprocess.Popen(command,
                                       stdout=self.log,stderr=subprocess.STDOUT)
         for _ in range(600):

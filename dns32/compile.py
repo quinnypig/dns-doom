@@ -69,13 +69,6 @@ class Wiring:
                     low=self.query(self.cut(a,4,8),'.',word(offset),'.add16')
                     high=self.query(self.cut(a,0,4),'.',self.cut(low,4,5),'.inc16' if offset>0 else '.dec16')
                     return self.copy(high,self.cut(low,0,4))
-        if self.optimize and op in ("add","sub"):
-            # Carry lookahead: one stage of byte generate/propagate lookups, one carry-chain
-            # lookup, one stage of byte selection. Three dependent trips instead of four.
-            gp=[self.query(self.cut(a,o,o+2),".",self.cut(b,o,o+2),f".{op}gp") for o in (0,2,4,6)]   # byte3..byte0
-            carries=self.query(*[self.cut(x,4,6) for x in gp],".cla")                                  # g3p3..g0p0 -> c3c2c1c0
-            return self.copy(*[self.query(self.cut(x,0,2),".",self.cut(x,2,4),".",self.cut(carries,i,i+1),".mux")
-                               for i,x in enumerate(gp)])
         result = []
         carry = "0"
         for offset in (6, 4, 2, 0):
@@ -94,22 +87,31 @@ class Wiring:
         return self.copy(*reversed(result))
 
     def compare(self, a, b, signed=False):
-        if not self.optimize:
-            state = "eq"
-            for offset in (0, 2, 4, 6):
-                state = self.query(self.cut(a,offset,offset+2), ".", self.cut(b,offset,offset+2),
-                                   ".", state, ".", "scmp" if signed and offset == 0 else "cmp")
-            return state
-        # All four byte comparisons in one stage, then one lookup picks the most significant difference.
-        bytes_=[self.query(self.cut(a,o,o+2),".",self.cut(b,o,o+2),".eq.","scmp" if signed and o==0 else "cmp") for o in (0,2,4,6)]
-        return self.query(bytes_[0],".",bytes_[1],".",bytes_[2],".",bytes_[3],".cmp4")
+        state = "eq"
+        for offset in (0, 2, 4, 6):
+            state = self.query(self.cut(a,offset,offset+2), ".", self.cut(b,offset,offset+2),
+                               ".", state, ".", "scmp" if signed and offset == 0 else "cmp")
+        return state
 
     def condition(self, comparison, condition):
         return self.query(comparison, ".", condition, ".cond")
 
+    def decide(self, a, b, condition, signed=False):
+        """Condition bit for a comparison: two stages when optimized, five otherwise."""
+        if not self.optimize:
+            return self.condition(self.compare(a, b, signed), condition)
+        # All four byte comparisons in one stage; one lookup then picks the most
+        # significant difference and applies the condition.
+        bytes_=[self.query(self.cut(a,o,o+2),".",self.cut(b,o,o+2),".eq.","scmp" if signed and o==0 else "cmp") for o in (0,2,4,6)]
+        return self.query(bytes_[0],".",bytes_[1],".",bytes_[2],".",bytes_[3],".",condition,".cond4")
+
     def mux(self, cond, a, b):
-        return self.copy(*[self.query(self.cut(a,i,i+2), ".", self.cut(b,i,i+2), ".", cond, ".mux")
-                           for i in (0,2,4,6)])
+        parts=[]
+        for i in (0,2,4,6):
+            if self.optimize and isinstance(a,str) and isinstance(b,str) and a[i:i+2]==b[i:i+2]:
+                parts.append(a[i:i+2])   # both candidates agree on this byte; nothing to select
+            else:parts.append(self.query(self.cut(a,i,i+2), ".", self.cut(b,i,i+2), ".", cond, ".mux"))
+        return self.copy(*parts)
 
     def shift_fixed(self, a, amount, kind):
         if amount == 0:
@@ -186,8 +188,7 @@ def compile_instruction(pc, ins,optimize=False):
     elif opcode == 0x63 and f3 in (0,1,4,5,6,7):
         a,b = w.reg(rs1),w.reg(rs2)
         condition = {0:"eq",1:"ne",4:"lt",5:"ge",6:"lt",7:"ge"}[f3]
-        compared = w.compare(a,b,signed=f3 in (4,5))
-        next_pc = w.mux(w.condition(compared,condition), word(pc+4), word(pc+imm_b))
+        next_pc = w.mux(w.decide(a,b,condition,signed=f3 in (4,5)), word(pc+4), word(pc+imm_b))
         label = {0:"BEQ",1:"BNE",4:"BLT",5:"BGE",6:"BLTU",7:"BGEU"}[f3]
     elif opcode == 0x03 and f3 in (0,1,2,4,5):
         value = w.load(w.reg(rs1), imm_i, {0:1,1:2,2:4,4:1,5:2}[f3], signed=f3 in (0,1))
@@ -206,8 +207,7 @@ def compile_instruction(pc, ins,optimize=False):
             op = {4:"xor",6:"or",7:"and"}[f3]
             value,label = w.alu(op,a,b),op.upper()
         elif f3 in (2,3) and (immediate or f7 == 0):
-            condition = w.condition(w.compare(a,b,signed=f3 == 2),"lt")
-            value,label = w.copy("0000000",condition),"SLT" if f3 == 2 else "SLTU"
+            value,label = w.copy("0000000",w.decide(a,b,"lt",signed=f3 == 2)),"SLT" if f3 == 2 else "SLTU"
         elif (f3 == 1 and f7 == 0) or (f3 == 5 and f7 in (0,32)):
             kind = "sll" if f3 == 1 else ("sra" if f7 == 32 else "srl")
             if immediate:
