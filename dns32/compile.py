@@ -100,6 +100,11 @@ class Wiring:
         """Condition bit for a comparison: two stages when optimized, five otherwise."""
         if not self.optimize:
             return self.condition(self.compare(a, b, signed), condition)
+        if a == "00000000" or b == "00000000":
+            # Comparisons against x0 use 16-bit half tables: two lookups, then the condition.
+            high=self.query(self.cut(a,0,4),".",self.cut(b,0,4),".","scmp16" if signed else "cmp16")
+            low=self.query(self.cut(a,4,8),".",self.cut(b,4,8),".cmp16")
+            return self.query(high,".",low,".",condition,".cond2")
         # All four byte comparisons in one stage; one lookup then picks the most
         # significant difference and applies the condition.
         bytes_=[self.query(self.cut(a,o,o+2),".",self.cut(b,o,o+2),".eq.","scmp" if signed and o==0 else "cmp") for o in (0,2,4,6)]

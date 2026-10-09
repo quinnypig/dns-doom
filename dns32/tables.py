@@ -10,6 +10,14 @@ def lookup(name):
                         "lt":value == "lt", "ge":value != "lt"}[cond]))
     if op == "cond4":
         return lookup(next((v for v in parts[:4] if v != "eq"), "eq")+"."+parts[4]+".cond")
+    if op == "cond2":
+        return lookup(next((v for v in parts[:2] if v != "eq"), "eq")+"."+parts[2]+".cond")
+    if op in ("cmp16","scmp16"):
+        a,b=int(parts[0],16),int(parts[1],16)
+        if op == "scmp16":
+            a = a-65536 if a & 32768 else a
+            b = b-65536 if b & 32768 else b
+        return "lt" if a < b else "gt" if a > b else "eq"
     a = int(parts[0],16)
     if op in ('inc16','dec16'):
         return f"{(a+int(parts[1])*(1 if op=='inc16' else -1))&65535:04x}"
@@ -59,6 +67,13 @@ def records():
                 for z in ("lt","eq","gt"):
                     for cond in ("eq","ne","lt","ge"):
                         name=f"{m}.{x}.{y}.{z}.{cond}.cond4";yield name,lookup(name)
+    for m in ("lt","eq","gt"):
+        for x in ("lt","eq","gt"):
+            for cond in ("eq","ne","lt","ge"):
+                name=f"{m}.{x}.{cond}.cond2";yield name,lookup(name)
+    for a in range(65536):
+        for op in ("cmp16","scmp16"):
+            for name in (f"{a:04x}.0000.{op}",f"0000.{a:04x}.{op}"):yield name,lookup(name)
     for value in ("lt","eq","gt"):
         for cond in ("eq","ne","lt","ge"):
             name = f"{value}.{cond}.cond"

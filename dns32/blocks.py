@@ -66,7 +66,7 @@ def fuse(items):
     for item in items:
         if isinstance(item,dict) and 'branch' in item:
             prefix,_=emit(item['branch'])
-            cond=next(prefix+out for kind,out,parts in item['branch']['steps'] if kind=='q' and parts[-1] in ('.cond','.cond4'))
+            cond=next(prefix+out for kind,out,parts in item['branch']['steps'] if kind=='q' and parts[-1] in ('.cond','.cond2','.cond4'))
             before=dict(registers);first=len(labels);changed=[]
             for p in item['arm']:
                 _,written=emit(p)
