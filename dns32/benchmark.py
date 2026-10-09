@@ -8,6 +8,7 @@ from .server import Server
 from .bus import Bus
 from .devices import Devices
 from .runtime import step
+from .optimized import invalidate
 
 class Track:
     def __init__(self,bus):self.bus=bus;self.written=set()
@@ -74,6 +75,7 @@ def main():
                 else:v=f"{image['registers'][int(n[1:3])]:08x}"
                 changes.append((n,v))
             for i in range(0,len(changes),200):raw.commit(changes[i:i+200])
+            invalidate(bus)
         raw.close()
     report={'configuration':vars(a),'runs':results,'wiring_revision':3,'median_seconds':statistics.median(r['seconds'] for r in results)}
     (out/'benchmark.json').write_text(json.dumps(report,indent=2));print(json.dumps(report),flush=True)

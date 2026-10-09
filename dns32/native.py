@@ -18,17 +18,19 @@ class NativeBus(Bus):
         self.sequence=(self.sequence+1)&65535
         return self.sequence
 
-    def exchange_many(self,requests,names):
+    def exchange_many(self,requests,names,lenient=()):
         replies=wire.exchange(self.socket.fileno(),requests)
         self.round_trips+=1
         indexed={reply[:2]:reply for reply in replies}
         if len(indexed)!=len(requests):raise RuntimeError('Duplicate DNS response IDs')
         ordered=[]
-        for request,name in zip(requests,names):
+        for index,(request,name) in enumerate(zip(requests,names)):
             reply=indexed.get(request[:2])
             if reply is None:raise RuntimeError('Unexpected DNS response ID')
             self.transactions+=1;self.payload_bytes+=len(request)+len(reply)
             flags=struct.unpack_from('!H',reply,2)[0]
+            if flags&0x8000 and flags&15==3 and index in lenient:
+                ordered.append(None);continue   # speculative fetch of a name that does not exist
             if not flags&0x8000 or flags&15:raise RuntimeError(f'DNS RCODE {flags&15} for {name}')
             if len(self.samples)<self.sample_limit:
                 self.samples.append({'name':name,'request_bytes':len(request),'response_bytes':len(reply)})
@@ -47,3 +49,10 @@ class NativeBus(Bus):
 
     def commit(self,changes,previous_pc=None,prerequisite='pc.reg'):
         self.exchange_many([wire.update(self.next_id(),changes,previous_pc,prerequisite)],['UPDATE'])
+
+    def commit_and_fetch(self,changes,previous,prerequisite,name):
+        """One round trip: the UPDATE and the next block's immutable plan query."""
+        update=wire.update(self.next_id(),changes,previous,prerequisite)
+        query=wire.query(self.next_id(),name)
+        replies=self.exchange_many([update,query],['UPDATE',name],lenient=(1,))
+        return None if replies[1] is None else wire.parse_txt(replies[1])

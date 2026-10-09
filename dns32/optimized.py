@@ -45,10 +45,34 @@ def schedule(raw):
     return plan,stages
 
 
+def invalidate(bus):
+    """Forget locally held copies of our own committed state (after external restores)."""
+    for attr in ('cached_state','prefetched_plan','prefetched_pc'):
+        try:delattr(bus,attr)
+        except AttributeError:pass
+
+
+def account(bus,plan,wires):
+    """Reporting only: count the instructions this block actually executed."""
+    labels=list(plan.get('labels',[plan['label']]))
+    skipped=[s for s in plan.get('skips',()) if wires[s[0]]=='1']
+    for _,start,length in sorted(skipped,key=lambda s:-s[1]):del labels[start:start+length]
+    bus.last_instructions=plan.get('instructions',1)-sum(s[2] for s in skipped)
+    bus.last_labels=labels
+
+
 def step(bus,io=None,pipeline=True,packed=False):
-    state=bus.txt('state.reg') if packed else None
-    pc=state[:8] if packed else bus.txt('pc.reg')
-    plan,stages=schedule(bus.txt(pc+'.code'))
+    if packed:
+        # Our own last committed state and the plan fetched alongside that commit.
+        # DNS still proves consistency: the UPDATE prerequisite names this exact state.
+        state=getattr(bus,'cached_state',None)
+        if state is None:state=bus.txt('state.reg')
+        pc=state[:8]
+        raw=getattr(bus,'prefetched_plan',None)
+        if raw is None or getattr(bus,'prefetched_pc',None)!=pc:raw=bus.txt(pc+'.code')
+    else:
+        state=None;pc=bus.txt('pc.reg');raw=bus.txt(pc+'.code')
+    plan,stages=schedule(raw)
     wires={'_state':state} if packed else {}
     for copies,queries in stages:
         for _,out,parts in copies:wires[out]=expand(parts,wires)
@@ -58,16 +82,20 @@ def step(bus,io=None,pipeline=True,packed=False):
             for (_,out,_),value in zip(queries,values):wires[out]=value
     changes=[(expand(n,wires),expand(v,wires)) for n,v in plan['writes']]
     if packed:
-        bus.commit(changes,state,prerequisite='state.reg')
-        bus.last_pc=next(v[:8] for n,v in changes if n=='state.reg')
+        new_state=next(v for n,v in changes if n=='state.reg');next_pc=new_state[:8]
+        fetch=getattr(bus,'commit_and_fetch',None)
+        if fetch is None:
+            bus.commit(changes,state,prerequisite='state.reg');bus.prefetched_plan=None
+        else:
+            bus.prefetched_plan=fetch(changes,state,'state.reg',next_pc+'.code')
+        bus.cached_state=new_state;bus.prefetched_pc=next_pc;bus.last_pc=next_pc
     else:
         bus.commit(changes,pc)
         bus.last_pc=next(v for n,v in changes if n=='pc.reg')
+    account(bus,plan,wires)
     if plan['trap']:
         if io is None:raise RuntimeError('ECALL without I/O')
         io.trap(bus)
-    bus.last_instructions=plan.get('instructions',1)
-    bus.last_labels=plan.get('labels',[plan['label']])
     return pc,plan['label']
 
 
@@ -90,4 +118,5 @@ class PackedRegisters:
                     i=self.offset(name);updated=updated[:i]+value+updated[i+8:]
                 else:other.append((name,value))
             self.bus.commit(other+[('state.reg',updated)],state,prerequisite='state.reg')
+            self.cached_state=updated
         else:self.bus.commit(changes,previous_pc,prerequisite=prerequisite)
