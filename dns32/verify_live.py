@@ -11,7 +11,7 @@ from .server import Server
 
 def main():
     import argparse
-    p=argparse.ArgumentParser();p.add_argument('--server',default='bind');p.add_argument('--native',action='store_true');p.add_argument('--optimized',action='store_true');p.add_argument('--packed',action='store_true');p.add_argument('--connections',type=int,default=1);p.add_argument('--dns-threads',type=int,default=1);p.add_argument('--sequencer',default='python',choices=['python','native']);p.add_argument('--output',default='artifacts/dns32-live-tests.json');args=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--server',default='bind');p.add_argument('--native',action='store_true');p.add_argument('--optimized',action='store_true');p.add_argument('--packed',action='store_true');p.add_argument('--connections',type=int,default=1);p.add_argument('--dns-threads',type=int,default=1);p.add_argument('--transport',default='tcp',choices=['tcp','udp']);p.add_argument('--sequencer',default='python',choices=['python','native']);p.add_argument('--output',default='artifacts/dns32-live-tests.json');args=p.parse_args()
     if args.native:
         from .native import NativeBus
         bus_class=NativeBus
@@ -42,13 +42,14 @@ def main():
         from .optimized import pack_plan,PackedRegisters
         image['packed']=True;image['code']={pc:pack_plan(v) for pc,v in code.items()}
     with Server(image,tables_path="artifacts/rv32/tables-v4.zone" if args.optimized else "artifacts/rv32/tables.zone",backend=args.server,threads=args.dns_threads):
-        bus=bus_class(connections=args.connections) if args.native else bus_class()
+        bus=bus_class(connections=args.connections,transport=args.transport) if args.native else bus_class()
         if args.packed:bus=PackedRegisters(bus)
         if args.sequencer=='native':
             from .native import NativeSequencer
             from .optimized import step_native
             sequencer=NativeSequencer(bus.bus)
-            execute=lambda b:step_native(b,sequencer)
+            from .optimized import flush
+            execute=lambda b:(step_native(b,sequencer,None,4),flush(b))   # chain allowed; flush so readback sees DNS state
         for i,(ins,a,b) in enumerate(cases):
             pc=0x1000+i*4
             oracle=Reference({"entry":pc,"memory":memory})

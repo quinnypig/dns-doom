@@ -17,7 +17,7 @@ def device(out,saved):
     return io
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--server',default='bind',choices=['bind','knot']);p.add_argument('--native',action='store_true');p.add_argument('--pipeline',action='store_true');p.add_argument('--optimize',action='store_true');p.add_argument('--packed',action='store_true');p.add_argument('--blocks',action='store_true');p.add_argument('--connections',type=int,default=1);p.add_argument('--dns-threads',type=int,default=1);p.add_argument('--sequencer',default='python',choices=['python','native']);p.add_argument('--steps',type=int,default=20000);p.add_argument('--repeat',type=int,default=3);p.add_argument('--output',required=True);a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--server',default='bind',choices=['bind','knot']);p.add_argument('--native',action='store_true');p.add_argument('--pipeline',action='store_true');p.add_argument('--optimize',action='store_true');p.add_argument('--packed',action='store_true');p.add_argument('--blocks',action='store_true');p.add_argument('--connections',type=int,default=1);p.add_argument('--dns-threads',type=int,default=1);p.add_argument('--transport',default='tcp',choices=['tcp','udp']);p.add_argument('--commit-every',type=int,default=1);p.add_argument('--sequencer',default='python',choices=['python','native']);p.add_argument('--steps',type=int,default=20000);p.add_argument('--repeat',type=int,default=3);p.add_argument('--output',required=True);a=p.parse_args()
     out=Path(a.output);out.mkdir(parents=True,exist_ok=True)
     image=load_elf('artifacts/tick-checkpoint/program.elf',optimize=a.optimize)
     saved=restore(image,'artifacts/tick-checkpoint')
@@ -37,7 +37,7 @@ def main():
     with Server(image,tables_path='artifacts/rv32/tables-v4.zone',backend=a.server,log_path=out/'server.log',threads=a.dns_threads):
         if a.native:
             from .native import NativeBus
-            raw=NativeBus(connections=a.connections)
+            raw=NativeBus(connections=a.connections,transport=a.transport)
         else:raw=Bus()
         bus=raw
         if a.packed:
@@ -47,7 +47,7 @@ def main():
             from .native import NativeSequencer
             from .optimized import step_native
             sequencer=NativeSequencer(raw)
-            execute=lambda io:step_native(bus,sequencer,io)
+            execute=lambda io:step_native(bus,sequencer,io,a.commit_every)
         elif a.pipeline or a.optimize or a.packed:
             from .optimized import step as fast_step
             execute=lambda io:fast_step(bus,io,a.pipeline,a.packed)
@@ -62,6 +62,9 @@ def main():
                 execute(io);executed+=getattr(bus,'last_instructions',1)
             assert executed==a.steps,'Benchmark boundary was crossed'
             elapsed=time.perf_counter()-start
+            if a.sequencer=='native':
+                from .optimized import flush
+                flush(bus)
             result={'seconds':elapsed,'instructions':a.steps,'dns_transactions':raw.transactions-before,'batches':getattr(raw,'round_trips',raw.transactions)-packets}
             assert [int(bus.txt(f'r{i:02}.reg'),16) for i in range(32)]==oracle.regs,'Register mismatch'
             assert int(bus.txt('pc.reg'),16)==oracle.pc,'PC mismatch'

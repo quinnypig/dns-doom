@@ -29,6 +29,8 @@ def main():
     parser.add_argument("--blocks",action="store_true",help="Fuse straight-line instructions between state commits")
     parser.add_argument("--connections",type=int,default=1,help="TCP connections the native sequencer spreads lookups over")
     parser.add_argument("--dns-threads",type=int,default=1,help="named worker threads")
+    parser.add_argument("--transport",choices=("tcp","udp"),default="tcp",help="Transport for the native sequencer's lookups")
+    parser.add_argument("--commit-every",type=int,default=1,help="Blocks registers may be carried as wires before a commit; stores and traps always commit")
     parser.add_argument("--sequencer",choices=("python","native"),default="python",help="Where the wiring loop runs; native requires --client native --packed --blocks")
     parser.add_argument("--preview",type=float,default=0,help="Seconds between DNS framebuffer previews (0 disables)")
     args=parser.parse_args()
@@ -66,7 +68,7 @@ def main():
     with Server(image,tables_path=args.tables,log_path=out/"named.log",backend=args.server,threads=args.dns_threads) as server:
         if args.client=="native":
             from .native import NativeBus
-            bus=NativeBus(connections=args.connections)
+            bus=NativeBus(connections=args.connections,transport=args.transport)
         else:bus=Bus()
         if args.packed:
             from .optimized import PackedRegisters
@@ -75,7 +77,7 @@ def main():
             from .native import NativeSequencer
             from .optimized import step_native
             sequencer=NativeSequencer(bus.bus)
-            execute=lambda:step_native(bus,sequencer,io)
+            execute=lambda:step_native(bus,sequencer,io,args.commit_every)
         elif args.pipeline or args.optimize or args.packed:
             from .optimized import step as optimized_step
             execute=lambda:optimized_step(bus,io,args.pipeline,args.packed)
@@ -112,6 +114,9 @@ def main():
             elapsed=time.monotonic()-start
             if profiler:
                 profiler.disable();profiler.dump_stats(str(out/"execution.prof"))
+            if args.sequencer=='native':
+                from .optimized import flush
+                flush(bus)
             regs={f"r{i:02}":bus.txt(f"r{i:02}.reg") for i in range(32)}
             pc=bus.txt("pc.reg")
             extra={}
@@ -145,7 +150,7 @@ def main():
             report["checkpoint_origin"]=checkpoint["origin"] if checkpoint else None
             report["elf_sha256"]=image["sha256"]
             report["client"]=args.client
-            report["optimization"]={"pipeline":args.pipeline,"packed":args.packed,"wiring":args.optimize,"blocks":args.blocks,"sequencer":args.sequencer,"connections":args.connections,"dns_threads":args.dns_threads}
+            report["optimization"]={"pipeline":args.pipeline,"packed":args.packed,"wiring":args.optimize,"blocks":args.blocks,"sequencer":args.sequencer,"connections":args.connections,"dns_threads":args.dns_threads,"transport":args.transport,"commit_every":args.commit_every}
             report['wiring_revision']=4 if args.optimize else 1
             report["clock_cycles"]=cycles
             report["preview_interval"]=args.preview

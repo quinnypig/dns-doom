@@ -12,9 +12,16 @@ class NativeBus(Bus):
     lookups over several server threads. Commits and all Python-side reads use
     the first connection.
     """
-    def __init__(self,*args,connections=1,**kwargs):
+    def __init__(self,*args,connections=1,transport='tcp',**kwargs):
         super().__init__(*args,**kwargs)
         self.sockets=[self.socket]
+        self.udp=[]
+        if transport=='udp':
+            for _ in range(connections):
+                u=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+                u.connect((kwargs.get('host','127.0.0.1'),kwargs.get('port',15354)))
+                u.setsockopt(socket.SOL_SOCKET,socket.SO_RCVTIMEO,struct.pack('ll',0,500000))
+                self.udp.append(u)
         for _ in range(connections-1):
             self.sockets.append(socket.create_connection((kwargs.get('host','127.0.0.1'),kwargs.get('port',15354)),timeout=10))
         for s in self.sockets:
@@ -25,7 +32,7 @@ class NativeBus(Bus):
         self.round_trips=0
 
     def close(self):
-        for s in self.sockets:s.close()
+        for s in self.sockets+self.udp:s.close()
 
     def next_id(self):
         self.sequence=(self.sequence+1)&65535
@@ -83,6 +90,7 @@ def compile_native(raw):
     writes=[([part(p) for p in n],[part(p) for p in v]) for n,v in plan['writes']]
     state_write=next(i for i,(n,_) in enumerate(plan['writes']) if n==['state.reg'])
     skips=[(wire_of(c),length) for c,_,length in plan.get('skips',())]
+    plan['memory_writes']=len(plan['writes'])>1
     return plan,wire.compile_plan(out_stages,writes,skips,len(index),state_write)
 
 
@@ -96,13 +104,17 @@ class NativeSequencer:
     def __init__(self,bus):
         self.bus=bus;self.compiled={}
 
-    def step(self,state,raw):
+    def plan(self,raw):
         entry=self.compiled.get(raw)
         if entry is None:entry=self.compiled[raw]=compile_native(raw)
-        plan,capsule=entry
+        return entry
+
+    def step(self,state,raw,committed,commit):
+        plan,capsule=self.plan(raw)
         bus=self.bus
         new_state,next_raw,skipped,transactions,payload,trips,bus.sequence,samples=wire.run(
-            [s.fileno() for s in bus.sockets],capsule,state,bus.sequence,max(0,bus.sample_limit-len(bus.samples)))
+            [s.fileno() for s in bus.sockets],[u.fileno() for u in bus.udp],capsule,state,committed,commit,
+            bus.sequence,max(0,bus.sample_limit-len(bus.samples)))
         bus.transactions+=transactions;bus.payload_bytes+=payload;bus.round_trips+=trips
         bus.samples.extend({'name':n,'request_bytes':a,'response_bytes':b} for n,a,b in samples)
         return plan,new_state,next_raw,skipped

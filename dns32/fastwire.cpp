@@ -136,35 +136,72 @@ static void lookups(const std::vector<int>& fds,const std::vector<Step>& queries
     }
 }
 
-// run(fds, plan, state, next_id, sample_room) ->
+// UDP lanes: each lane is a connected datagram socket with a receive timeout.
+// Lost datagrams (practically impossible on loopback) are simply re-sent.
+static void lookups_udp(const std::vector<int>& fds,const std::vector<Step>& queries,std::vector<string>& wires,unsigned& next_id,Counters& c,int& sample_room,std::vector<std::pair<string,std::pair<size_t,size_t>>>& samples){
+    size_t n=queries.size();if(!n)return;
+    size_t per_round=BATCH*fds.size();
+    for(size_t start=0;start<n;start+=per_round){
+        size_t end=std::min(n,start+per_round),count=end-start;
+        size_t lanes=count<2?1:std::min(fds.size(),count);size_t each=(count+lanes-1)/lanes;
+        std::vector<string> names(count),reqs(count);std::vector<std::map<string,size_t>> pending(lanes);
+        for(size_t i=0;i<count;i++){size_t lane=i/each;names[i]=build(queries[start+i].parts,wires);next_id=(next_id+1)&65535;reqs[i]=encode_query(next_id,names[i]);
+            if(!pending[lane].emplace(reqs[i].substr(0,2),i).second)throw std::runtime_error("Duplicate DNS request IDs");}
+        for(size_t lane=0;lane<lanes;lane++){for(auto& kv:pending[lane]){const string& r=reqs[kv.second];if(send(fds[lane],r.data(),r.size(),MSG_NOSIGNAL)<0)throw std::runtime_error(string("DNS send: ")+strerror(errno));}c.trips++;}
+        for(size_t lane=0;lane<lanes;lane++){
+            int attempts=0;char buffer[65536];
+            while(!pending[lane].empty()){
+                ssize_t got=recv(fds[lane],buffer,sizeof(buffer),0);
+                if(got<0){if(errno==EINTR)continue;if(errno==EAGAIN||errno==EWOULDBLOCK){if(++attempts>10)throw std::runtime_error("DNS UDP lookups timed out");
+                        for(auto& kv:pending[lane]){const string& r=reqs[kv.second];if(send(fds[lane],r.data(),r.size(),MSG_NOSIGNAL)<0)throw std::runtime_error(string("DNS send: ")+strerror(errno));}c.trips++;continue;}
+                    throw std::runtime_error(string("DNS recv: ")+strerror(errno));}
+                if(got<12)continue;string reply(buffer,got);auto it=pending[lane].find(reply.substr(0,2));if(it==pending[lane].end())continue;   // stale duplicate
+                size_t i=it->second;pending[lane].erase(it);c.transactions++;c.payload+=reqs[i].size()+reply.size();
+                unsigned flags=r16(reply,2);if(flags&0x200)throw std::runtime_error("Truncated UDP answer for "+names[i]);
+                unsigned rc=rcode(reply,names[i]);if(rc)throw std::runtime_error("DNS RCODE "+std::to_string(rc)+" for "+names[i]);
+                wires[queries[start+i].out]=parse_txt(reply);
+                if(sample_room>0){samples.emplace_back(names[i],std::make_pair(reqs[i].size(),reply.size()));sample_room--;}
+            }
+        }
+    }
+}
+
+// run(tcp_fds, udp_fds, plan, state, committed_state, commit, next_id, sample_room) ->
 //   (new_state, next_plan_text_or_None, [arm skipped...], transactions, payload_bytes, round_trips, next_id, [(name,req,resp)...])
-static PyObject* run(PyObject*,PyObject* args){PyObject* fdlist;PyObject* cap;const char* state_c;unsigned next_id;int sample_room;
-    if(!PyArg_ParseTuple(args,"OOsIi",&fdlist,&cap,&state_c,&next_id,&sample_room))return nullptr;
+// `state` is the register wire carried into this block; `committed_state` is what DNS
+// currently holds and is the UPDATE prerequisite when `commit` is set. Memory writes
+// are always committed (a block with stores must be run with commit set).
+static PyObject* run(PyObject*,PyObject* args){PyObject *fdlist,*udplist,*cap;const char *state_c,*committed_c;int commit;unsigned next_id;int sample_room;
+    if(!PyArg_ParseTuple(args,"OOOsspIi",&fdlist,&udplist,&cap,&state_c,&committed_c,&commit,&next_id,&sample_room))return nullptr;
     Plan* plan=static_cast<Plan*>(PyCapsule_GetPointer(cap,CAPSULE));if(!plan)return nullptr;
     try{
-        std::vector<int> fds;Py_ssize_t nf=PySequence_Size(fdlist);if(nf<1)throw std::runtime_error("Expected at least one connection");
-        for(Py_ssize_t i=0;i<nf;i++){PyObject* o=PySequence_GetItem(fdlist,i);if(!o)throw std::runtime_error("Expected fd");long fd=PyLong_AsLong(o);Py_DECREF(o);if(fd<0)throw std::runtime_error("Expected fd");fds.push_back((int)fd);}
+        auto fds_of=[](PyObject* list,bool required){std::vector<int> fds;Py_ssize_t nf=PySequence_Size(list);if(nf<0||(required&&nf<1))throw std::runtime_error("Expected connections");
+            for(Py_ssize_t i=0;i<nf;i++){PyObject* o=PySequence_GetItem(list,i);if(!o)throw std::runtime_error("Expected fd");long fd=PyLong_AsLong(o);Py_DECREF(o);if(fd<0)throw std::runtime_error("Expected fd");fds.push_back((int)fd);}return fds;};
+        std::vector<int> fds=fds_of(fdlist,true),udp=fds_of(udplist,false);
         int fd=fds[0];
         std::vector<string> wires(plan->wires);wires[0]=state_c;Counters c;std::vector<std::pair<string,std::pair<size_t,size_t>>> samples;
         auto id=[&](){next_id=(next_id+1)&65535;return next_id;};
         for(auto& stage:plan->stages){
             for(auto& s:stage.copies)wires[s.out]=build(s.parts,wires);
-            lookups(fds,stage.queries,wires,next_id,c,sample_room,samples);
+            if(udp.empty())lookups(fds,stage.queries,wires,next_id,c,sample_room,samples);
+            else lookups_udp(udp,stage.queries,wires,next_id,c,sample_room,samples);
         }
         std::vector<std::pair<string,string>> changes;for(auto& w:plan->writes)changes.emplace_back(build(w.first,wires),build(w.second,wires));
         const string& new_state=changes[plan->state_write].second;if(new_state.size()<8)throw std::runtime_error("Invalid state value");
-        string previous=wires[0];string next_name=new_state.substr(0,8)+".code";
-        std::vector<string> reqs{encode_update(id(),changes,&previous,"state.reg"),encode_query(id(),next_name)};
+        if(!commit&&changes.size()!=1)throw std::runtime_error("A block with memory writes must commit");
+        string previous=committed_c;string next_name=new_state.substr(0,8)+".code";
+        std::vector<string> reqs;if(commit)reqs.push_back(encode_update(id(),changes,&previous,"state.reg"));reqs.push_back(encode_query(id(),next_name));
         std::vector<string> replies=exchange_counted(fd,reqs,c);
-        std::map<string,size_t> ids{{reqs[0].substr(0,2),0},{reqs[1].substr(0,2),1}};string ordered[2];std::vector<char> seen(2,0);
+        std::map<string,size_t> ids;for(size_t k=0;k<reqs.size();k++)ids[reqs[k].substr(0,2)]=k;std::vector<string> ordered(reqs.size());std::vector<char> seen(reqs.size(),0);
         for(auto& reply:replies){auto it=ids.find(reply.substr(0,2));if(it==ids.end()||seen[it->second]++)throw std::runtime_error("Unexpected DNS response ID");ordered[it->second]=reply;}
-        unsigned rc=rcode(ordered[0],"UPDATE");if(rc)throw std::runtime_error("DNS RCODE "+std::to_string(rc)+" for UPDATE");
-        if(sample_room>0){samples.emplace_back("UPDATE",std::make_pair(reqs[0].size(),ordered[0].size()));sample_room--;}
-        rc=rcode(ordered[1],next_name);PyObject* next_raw;
+        size_t q=reqs.size()-1;
+        if(commit){unsigned rc=rcode(ordered[0],"UPDATE");if(rc)throw std::runtime_error("DNS RCODE "+std::to_string(rc)+" for UPDATE");
+            if(sample_room>0){samples.emplace_back("UPDATE",std::make_pair(reqs[0].size(),ordered[0].size()));sample_room--;}}
+        unsigned rc=rcode(ordered[q],next_name);PyObject* next_raw;
         if(rc==3){Py_INCREF(Py_None);next_raw=Py_None;}   // speculative fetch past the last plan
         else if(rc)throw std::runtime_error("DNS RCODE "+std::to_string(rc)+" for "+next_name);
-        else{string t=parse_txt(ordered[1]);next_raw=PyUnicode_DecodeASCII(t.data(),t.size(),"strict");if(!next_raw)return nullptr;
-            if(sample_room>0){samples.emplace_back(next_name,std::make_pair(reqs[1].size(),ordered[1].size()));sample_room--;}}
+        else{string t=parse_txt(ordered[q]);next_raw=PyUnicode_DecodeASCII(t.data(),t.size(),"strict");if(!next_raw)return nullptr;
+            if(sample_room>0){samples.emplace_back(next_name,std::make_pair(reqs[q].size(),ordered[q].size()));sample_room--;}}
         PyObject* skipped=PyList_New(plan->skips.size());for(size_t i=0;i<plan->skips.size();i++){PyObject* b=wires[plan->skips[i].first]=="1"?Py_True:Py_False;Py_INCREF(b);PyList_SET_ITEM(skipped,i,b);}
         PyObject* samp=PyList_New(samples.size());for(size_t i=0;i<samples.size();i++)PyList_SET_ITEM(samp,i,Py_BuildValue("(snn)",samples[i].first.c_str(),(Py_ssize_t)samples[i].second.first,(Py_ssize_t)samples[i].second.second));
         PyObject* result=Py_BuildValue("(s#NNlllIN)",new_state.data(),(Py_ssize_t)new_state.size(),next_raw,skipped,c.transactions,c.payload,c.trips,next_id,samp);
