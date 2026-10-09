@@ -6,13 +6,26 @@ from . import _fastwire as wire
 
 
 class NativeBus(Bus):
-    def __init__(self,*args,**kwargs):
+    """Persistent TCP connections to the authoritative server.
+
+    Extra connections let the native sequencer spread one stage's independent
+    lookups over several server threads. Commits and all Python-side reads use
+    the first connection.
+    """
+    def __init__(self,*args,connections=1,**kwargs):
         super().__init__(*args,**kwargs)
-        self.socket.settimeout(None)
-        self.socket.setsockopt(socket.SOL_SOCKET,socket.SO_RCVTIMEO,struct.pack('ll',10,0))
-        self.socket.setsockopt(socket.SOL_SOCKET,socket.SO_SNDTIMEO,struct.pack('ll',10,0))
-        self.socket.setsockopt(socket.IPPROTO_TCP,socket.TCP_NODELAY,1)
+        self.sockets=[self.socket]
+        for _ in range(connections-1):
+            self.sockets.append(socket.create_connection((kwargs.get('host','127.0.0.1'),kwargs.get('port',15354)),timeout=10))
+        for s in self.sockets:
+            s.settimeout(None)
+            s.setsockopt(socket.SOL_SOCKET,socket.SO_RCVTIMEO,struct.pack('ll',10,0))
+            s.setsockopt(socket.SOL_SOCKET,socket.SO_SNDTIMEO,struct.pack('ll',10,0))
+            s.setsockopt(socket.IPPROTO_TCP,socket.TCP_NODELAY,1)
         self.round_trips=0
+
+    def close(self):
+        for s in self.sockets:s.close()
 
     def next_id(self):
         self.sequence=(self.sequence+1)&65535
@@ -89,7 +102,7 @@ class NativeSequencer:
         plan,capsule=entry
         bus=self.bus
         new_state,next_raw,skipped,transactions,payload,trips,bus.sequence,samples=wire.run(
-            bus.socket.fileno(),capsule,state,bus.sequence,max(0,bus.sample_limit-len(bus.samples)))
+            [s.fileno() for s in bus.sockets],capsule,state,bus.sequence,max(0,bus.sample_limit-len(bus.samples)))
         bus.transactions+=transactions;bus.payload_bytes+=payload;bus.round_trips+=trips
         bus.samples.extend({'name':n,'request_bytes':a,'response_bytes':b} for n,a,b in samples)
         return plan,new_state,next_raw,skipped

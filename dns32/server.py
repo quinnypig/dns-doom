@@ -52,6 +52,7 @@ def prepare(root,image,tables_path=None):
  allow-query { 127.0.0.1; }; allow-transfer { none; };
  pid-file "%s/named.pid"; session-keyfile "%s/session.key";
  tcp-idle-timeout 1200; tcp-keepalive-timeout 1200;
+ minimal-responses yes;
  %s
 };
 controls {};
@@ -68,7 +69,8 @@ zone "rv.test" { type primary; file "machine.zone";
 
 
 class Server:
-    def __init__(self,image,root=None,tables_path=None,log_path=None,backend="bind"):
+    def __init__(self,image,root=None,tables_path=None,log_path=None,backend="bind",threads=1):
+        self.threads=threads
         self.root=Path(root or tempfile.mkdtemp(prefix="dns32-",dir="/dev/shm"))
         self.log_path=Path(log_path) if log_path else self.root/"named.log"
         prepare(self.root,image,tables_path)
@@ -109,7 +111,7 @@ zone:
         self.log=self.log_path.open("w")
         # -g overrides configured logging; -f stays foreground and honors it.
         command=(["knotd","-c",str(self.root/"knot.conf")] if self.backend=="knot" else
-                 ["named","-f","-n",os.environ.get("DNS32_NAMED_THREADS","1"),"-c",str(self.root/"named.conf")])
+                 ["named","-f","-n",str(self.threads),"-c",str(self.root/"named.conf")])
         self.process=subprocess.Popen(command,
                                       stdout=self.log,stderr=subprocess.STDOUT)
         for _ in range(600):

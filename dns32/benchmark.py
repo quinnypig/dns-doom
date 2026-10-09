@@ -17,7 +17,7 @@ def device(out,saved):
     return io
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--server',default='bind',choices=['bind','knot']);p.add_argument('--native',action='store_true');p.add_argument('--pipeline',action='store_true');p.add_argument('--optimize',action='store_true');p.add_argument('--packed',action='store_true');p.add_argument('--blocks',action='store_true');p.add_argument('--sequencer',default='python',choices=['python','native']);p.add_argument('--steps',type=int,default=20000);p.add_argument('--repeat',type=int,default=3);p.add_argument('--output',required=True);a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--server',default='bind',choices=['bind','knot']);p.add_argument('--native',action='store_true');p.add_argument('--pipeline',action='store_true');p.add_argument('--optimize',action='store_true');p.add_argument('--packed',action='store_true');p.add_argument('--blocks',action='store_true');p.add_argument('--connections',type=int,default=1);p.add_argument('--dns-threads',type=int,default=1);p.add_argument('--sequencer',default='python',choices=['python','native']);p.add_argument('--steps',type=int,default=20000);p.add_argument('--repeat',type=int,default=3);p.add_argument('--output',required=True);a=p.parse_args()
     out=Path(a.output);out.mkdir(parents=True,exist_ok=True)
     image=load_elf('artifacts/tick-checkpoint/program.elf',optimize=a.optimize)
     saved=restore(image,'artifacts/tick-checkpoint')
@@ -34,10 +34,10 @@ def main():
     if a.packed:
         from .optimized import pack_plan
         image['packed']=True;image['code']={pc:pack_plan(v) for pc,v in image['code'].items()}
-    with Server(image,tables_path='artifacts/rv32/tables-v4.zone',backend=a.server,log_path=out/'server.log'):
+    with Server(image,tables_path='artifacts/rv32/tables-v4.zone',backend=a.server,log_path=out/'server.log',threads=a.dns_threads):
         if a.native:
             from .native import NativeBus
-            raw=NativeBus()
+            raw=NativeBus(connections=a.connections)
         else:raw=Bus()
         bus=raw
         if a.packed:

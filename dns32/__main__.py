@@ -27,6 +27,8 @@ def main():
     parser.add_argument("--optimize",action="store_true")
     parser.add_argument("--packed",action="store_true")
     parser.add_argument("--blocks",action="store_true",help="Fuse straight-line instructions between state commits")
+    parser.add_argument("--connections",type=int,default=1,help="TCP connections the native sequencer spreads lookups over")
+    parser.add_argument("--dns-threads",type=int,default=1,help="named worker threads")
     parser.add_argument("--sequencer",choices=("python","native"),default="python",help="Where the wiring loop runs; native requires --client native --packed --blocks")
     parser.add_argument("--preview",type=float,default=0,help="Seconds between DNS framebuffer previews (0 disables)")
     args=parser.parse_args()
@@ -61,10 +63,10 @@ def main():
         for handle,pos in saved["files"].items():
             f=io.wad.open("rb");f.seek(pos);io.files[int(handle)]=f
     counts=Counter();milestones=[];status="limit";executed=0
-    with Server(image,tables_path=args.tables,log_path=out/"named.log",backend=args.server) as server:
+    with Server(image,tables_path=args.tables,log_path=out/"named.log",backend=args.server,threads=args.dns_threads) as server:
         if args.client=="native":
             from .native import NativeBus
-            bus=NativeBus()
+            bus=NativeBus(connections=args.connections)
         else:bus=Bus()
         if args.packed:
             from .optimized import PackedRegisters
@@ -143,7 +145,7 @@ def main():
             report["checkpoint_origin"]=checkpoint["origin"] if checkpoint else None
             report["elf_sha256"]=image["sha256"]
             report["client"]=args.client
-            report["optimization"]={"pipeline":args.pipeline,"packed":args.packed,"wiring":args.optimize,"blocks":args.blocks,"sequencer":args.sequencer}
+            report["optimization"]={"pipeline":args.pipeline,"packed":args.packed,"wiring":args.optimize,"blocks":args.blocks,"sequencer":args.sequencer,"connections":args.connections,"dns_threads":args.dns_threads}
             report['wiring_revision']=4 if args.optimize else 1
             report["clock_cycles"]=cycles
             report["preview_interval"]=args.preview

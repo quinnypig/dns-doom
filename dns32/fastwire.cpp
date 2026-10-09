@@ -35,15 +35,17 @@ static string encode_update(unsigned id,const std::vector<std::pair<string,strin
 
 // ---- transport --------------------------------------------------------------
 static void sendall(int fd,const string& s){size_t p=0;while(p<s.size()){ssize_t n=send(fd,s.data()+p,s.size()-p,MSG_NOSIGNAL);if(n<0&&errno==EINTR)continue;if(n<=0)throw std::runtime_error(string("DNS send: ")+strerror(errno));p+=n;}}
+static std::vector<string> receive(int fd,size_t count){
+    std::vector<string> replies;string incoming;size_t cursor=0;
+    auto need=[&](size_t n){while(incoming.size()-cursor<n){char buffer[65536];ssize_t got=recv(fd,buffer,sizeof(buffer),0);if(got<0&&errno==EINTR)continue;if(got<=0)throw std::runtime_error(got==0?"DNS connection closed":string("DNS recv: ")+strerror(errno));incoming.append(buffer,got);}};
+    for(size_t i=0;i<count;i++){need(2);unsigned size=r16(incoming,cursor);cursor+=2;need(size);replies.push_back(incoming.substr(cursor,size));cursor+=size;}
+    if(cursor!=incoming.size())throw std::runtime_error("Unsolicited DNS response bytes");
+    return replies;}
 static std::vector<string> do_exchange(int fd,const std::vector<string>& requests){
     if(requests.empty())throw std::runtime_error("Empty DNS batch");
     string packet;for(auto& r:requests){if(r.size()>65535)throw std::runtime_error("DNS packet too large");u16(packet,r.size());packet+=r;}
     sendall(fd,packet);
-    std::vector<string> replies;string incoming;size_t cursor=0;
-    auto need=[&](size_t count){while(incoming.size()-cursor<count){char buffer[65536];ssize_t got=recv(fd,buffer,sizeof(buffer),0);if(got<0&&errno==EINTR)continue;if(got<=0)throw std::runtime_error(got==0?"DNS connection closed":string("DNS recv: ")+strerror(errno));incoming.append(buffer,got);}};
-    for(size_t i=0;i<requests.size();i++){need(2);unsigned size=r16(incoming,cursor);cursor+=2;need(size);replies.push_back(incoming.substr(cursor,size));cursor+=size;}
-    if(cursor!=incoming.size())throw std::runtime_error("Unsolicited DNS response bytes");
-    return replies;}
+    return receive(fd,requests.size());}
 
 // ---- decoders ---------------------------------------------------------------
 static size_t skip(const string& s,size_t p){while(true){if(p>=s.size())throw std::runtime_error("Truncated name");unsigned n=(unsigned char)s[p++];if(!n)return p;if((n&0xc0)==0xc0){if(p>=s.size())throw std::runtime_error("Truncated pointer");return p+1;}if(n&0xc0||p+n>s.size())throw std::runtime_error("Malformed name");p+=n;}}
@@ -108,27 +110,46 @@ static string build(const std::vector<Part>& parts,const std::vector<string>& wi
 struct Counters{long transactions=0,payload=0,trips=0;};
 static std::vector<string> exchange_counted(int fd,const std::vector<string>& reqs,Counters& c){std::vector<string> replies=do_exchange(fd,reqs);c.trips++;c.transactions+=reqs.size();for(size_t i=0;i<reqs.size();i++)c.payload+=reqs[i].size()+replies[i].size();return replies;}
 
-// run(fd, plan, state, next_id, sample_room) ->
+// One stage's lookups, spread over the connections: all requests are written first,
+// then every connection's replies are collected. The server may answer each
+// connection on a different thread; the sequencer only waits.
+static void lookups(const std::vector<int>& fds,const std::vector<Step>& queries,std::vector<string>& wires,unsigned& next_id,Counters& c,int& sample_room,std::vector<std::pair<string,std::pair<size_t,size_t>>>& samples){
+    size_t n=queries.size();if(!n)return;
+    size_t per_round=BATCH*fds.size();
+    for(size_t start=0;start<n;start+=per_round){
+        size_t end=std::min(n,start+per_round),count=end-start;
+        size_t lanes=count<2?1:std::min(fds.size(),count);size_t each=(count+lanes-1)/lanes;
+        std::vector<std::vector<string>> reqs(lanes);std::vector<std::vector<size_t>> index(lanes);std::vector<string> names(count);
+        for(size_t i=0;i<count;i++){size_t lane=i/each;names[i]=build(queries[start+i].parts,wires);next_id=(next_id+1)&65535;reqs[lane].push_back(encode_query(next_id,names[i]));index[lane].push_back(i);}
+        for(size_t lane=0;lane<lanes;lane++){string packet;for(auto& r:reqs[lane]){u16(packet,r.size());packet+=r;}sendall(fds[lane],packet);}
+        for(size_t lane=0;lane<lanes;lane++){
+            std::map<string,size_t> ids;for(size_t k=0;k<reqs[lane].size();k++)ids[reqs[lane][k].substr(0,2)]=k;
+            if(ids.size()!=reqs[lane].size())throw std::runtime_error("Duplicate DNS request IDs");
+            std::vector<string> replies=receive(fds[lane],reqs[lane].size());c.trips++;c.transactions+=reqs[lane].size();
+            std::vector<char> seen(reqs[lane].size(),0);
+            for(auto& reply:replies){auto it=ids.find(reply.substr(0,2));if(it==ids.end()||seen[it->second]++)throw std::runtime_error("Unexpected DNS response ID");size_t k=it->second,i=index[lane][k];
+                c.payload+=reqs[lane][k].size()+reply.size();
+                unsigned rc=rcode(reply,names[i]);if(rc)throw std::runtime_error("DNS RCODE "+std::to_string(rc)+" for "+names[i]);
+                wires[queries[start+i].out]=parse_txt(reply);
+                if(sample_room>0){samples.emplace_back(names[i],std::make_pair(reqs[lane][k].size(),reply.size()));sample_room--;}}
+        }
+    }
+}
+
+// run(fds, plan, state, next_id, sample_room) ->
 //   (new_state, next_plan_text_or_None, [arm skipped...], transactions, payload_bytes, round_trips, next_id, [(name,req,resp)...])
-static PyObject* run(PyObject*,PyObject* args){int fd;PyObject* cap;const char* state_c;unsigned next_id;int sample_room;
-    if(!PyArg_ParseTuple(args,"iOsIi",&fd,&cap,&state_c,&next_id,&sample_room))return nullptr;
+static PyObject* run(PyObject*,PyObject* args){PyObject* fdlist;PyObject* cap;const char* state_c;unsigned next_id;int sample_room;
+    if(!PyArg_ParseTuple(args,"OOsIi",&fdlist,&cap,&state_c,&next_id,&sample_room))return nullptr;
     Plan* plan=static_cast<Plan*>(PyCapsule_GetPointer(cap,CAPSULE));if(!plan)return nullptr;
     try{
+        std::vector<int> fds;Py_ssize_t nf=PySequence_Size(fdlist);if(nf<1)throw std::runtime_error("Expected at least one connection");
+        for(Py_ssize_t i=0;i<nf;i++){PyObject* o=PySequence_GetItem(fdlist,i);if(!o)throw std::runtime_error("Expected fd");long fd=PyLong_AsLong(o);Py_DECREF(o);if(fd<0)throw std::runtime_error("Expected fd");fds.push_back((int)fd);}
+        int fd=fds[0];
         std::vector<string> wires(plan->wires);wires[0]=state_c;Counters c;std::vector<std::pair<string,std::pair<size_t,size_t>>> samples;
         auto id=[&](){next_id=(next_id+1)&65535;return next_id;};
         for(auto& stage:plan->stages){
             for(auto& s:stage.copies)wires[s.out]=build(s.parts,wires);
-            for(size_t start=0;start<stage.queries.size();start+=BATCH){
-                size_t end=std::min(stage.queries.size(),start+BATCH);std::vector<string> reqs;std::vector<string> names;std::map<string,size_t> ids;
-                for(size_t i=start;i<end;i++){names.push_back(build(stage.queries[i].parts,wires));reqs.push_back(encode_query(id(),names.back()));ids[reqs.back().substr(0,2)]=i-start;}
-                if(ids.size()!=reqs.size())throw std::runtime_error("Duplicate DNS request IDs");
-                std::vector<string> replies=exchange_counted(fd,reqs,c);
-                std::vector<char> seen(reqs.size(),0);
-                for(auto& reply:replies){auto it=ids.find(reply.substr(0,2));if(it==ids.end()||seen[it->second]++)throw std::runtime_error("Unexpected DNS response ID");size_t i=it->second;
-                    unsigned rc=rcode(reply,names[i]);if(rc)throw std::runtime_error("DNS RCODE "+std::to_string(rc)+" for "+names[i]);
-                    wires[stage.queries[start+i].out]=parse_txt(reply);
-                    if(sample_room>0){samples.emplace_back(names[i],std::make_pair(reqs[i].size(),reply.size()));sample_room--;}}
-            }
+            lookups(fds,stage.queries,wires,next_id,c,sample_room,samples);
         }
         std::vector<std::pair<string,string>> changes;for(auto& w:plan->writes)changes.emplace_back(build(w.first,wires),build(w.second,wires));
         const string& new_state=changes[plan->state_write].second;if(new_state.size()<8)throw std::runtime_error("Invalid state value");
