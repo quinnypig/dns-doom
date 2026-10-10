@@ -45,10 +45,42 @@ def schedule(raw):
     return plan,stages
 
 
+def invalidate(bus):
+    """Forget locally held copies of our own committed state (after external restores)."""
+    for attr in ('cached_state','committed_state','prefetched_plan','prefetched_pc','chained'):
+        try:delattr(bus,attr)
+        except AttributeError:pass
+
+
+def flush(bus):
+    """Commit registers carried as wires since the last DNS commit, if any."""
+    carried=getattr(bus,'cached_state',None);committed=getattr(bus,'committed_state',None)
+    if carried is not None and carried!=committed:
+        bus.bus.commit([('state.reg',carried)],committed,prerequisite='state.reg')
+        bus.committed_state=carried;bus.chained=0
+
+
+def account(bus,plan,wires):
+    """Reporting only: count the instructions this block actually executed."""
+    labels=list(plan.get('labels',[plan['label']]))
+    skipped=[s for s in plan.get('skips',()) if wires[s[0]]=='1']
+    for _,start,length in sorted(skipped,key=lambda s:-s[1]):del labels[start:start+length]
+    bus.last_instructions=plan.get('instructions',1)-sum(s[2] for s in skipped)
+    bus.last_labels=labels
+
+
 def step(bus,io=None,pipeline=True,packed=False):
-    state=bus.txt('state.reg') if packed else None
-    pc=state[:8] if packed else bus.txt('pc.reg')
-    plan,stages=schedule(bus.txt(pc+'.code'))
+    if packed:
+        # Our own last committed state and the plan fetched alongside that commit.
+        # DNS still proves consistency: the UPDATE prerequisite names this exact state.
+        state=getattr(bus,'cached_state',None)
+        if state is None:state=bus.txt('state.reg')
+        pc=state[:8]
+        raw=getattr(bus,'prefetched_plan',None)
+        if raw is None or getattr(bus,'prefetched_pc',None)!=pc:raw=bus.txt(pc+'.code')
+    else:
+        state=None;pc=bus.txt('pc.reg');raw=bus.txt(pc+'.code')
+    plan,stages=schedule(raw)
     wires={'_state':state} if packed else {}
     for copies,queries in stages:
         for _,out,parts in copies:wires[out]=expand(parts,wires)
@@ -58,16 +90,51 @@ def step(bus,io=None,pipeline=True,packed=False):
             for (_,out,_),value in zip(queries,values):wires[out]=value
     changes=[(expand(n,wires),expand(v,wires)) for n,v in plan['writes']]
     if packed:
-        bus.commit(changes,state,prerequisite='state.reg')
-        bus.last_pc=next(v[:8] for n,v in changes if n=='state.reg')
+        new_state=next(v for n,v in changes if n=='state.reg');next_pc=new_state[:8]
+        fetch=getattr(bus,'commit_and_fetch',None)
+        if fetch is None:
+            bus.commit(changes,state,prerequisite='state.reg');bus.prefetched_plan=None
+        else:
+            bus.prefetched_plan=fetch(changes,state,'state.reg',next_pc+'.code')
+        bus.cached_state=new_state;bus.prefetched_pc=next_pc;bus.last_pc=next_pc
     else:
         bus.commit(changes,pc)
         bus.last_pc=next(v for n,v in changes if n=='pc.reg')
+    account(bus,plan,wires)
     if plan['trap']:
         if io is None:raise RuntimeError('ECALL without I/O')
         io.trap(bus)
-    bus.last_instructions=plan.get('instructions',1)
-    bus.last_labels=plan.get('labels',[plan['label']])
+    return pc,plan['label']
+
+
+def step_native(bus,sequencer,io=None,commit_every=1):
+    """Packed block step whose wiring loop runs in the native extension.
+
+    Registers may be carried as wires across up to `commit_every` blocks, exactly
+    as they are carried between instructions inside one block. Any block that
+    writes memory or traps commits, so DNS memory is always current and host I/O
+    always sees committed state. The UPDATE prerequisite names the last state DNS
+    accepted, so a stale or diverged commit is still rejected by the server.
+    """
+    state=getattr(bus,'cached_state',None)
+    if state is None:state=bus.cached_state=bus.committed_state=bus.txt('state.reg');bus.chained=0
+    committed=getattr(bus,'committed_state',None)
+    if committed is None:committed=bus.committed_state=state
+    pc=state[:8]
+    raw=getattr(bus,'prefetched_plan',None)
+    if raw is None or getattr(bus,'prefetched_pc',None)!=pc:raw=bus.txt(pc+'.code')
+    plan,_=sequencer.plan(raw)
+    chained=getattr(bus,'chained',0)
+    commit=plan['memory_writes'] or plan['trap'] or chained+1>=commit_every
+    plan,new_state,next_raw,skipped=sequencer.step(state,raw,committed,commit)
+    if commit:bus.committed_state=new_state;bus.chained=0
+    else:bus.chained=chained+1
+    bus.cached_state=new_state;bus.prefetched_plan=next_raw;bus.prefetched_pc=bus.last_pc=new_state[:8]
+    wires={s[0]:('1' if hit else '0') for s,hit in zip(plan.get('skips',()),skipped)}
+    account(bus,plan,wires)
+    if plan['trap']:
+        if io is None:raise RuntimeError('ECALL without I/O')
+        io.trap(bus)
     return pc,plan['label']
 
 
@@ -90,4 +157,5 @@ class PackedRegisters:
                     i=self.offset(name);updated=updated[:i]+value+updated[i+8:]
                 else:other.append((name,value))
             self.bus.commit(other+[('state.reg',updated)],state,prerequisite='state.reg')
+            self.cached_state=self.committed_state=updated;self.chained=0
         else:self.bus.commit(changes,previous_pc,prerequisite=prerequisite)

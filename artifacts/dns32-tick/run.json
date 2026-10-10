@@ -1,11 +1,11 @@
 {
-  "backend": "DNS / stock BIND",
-  "elf": "artifacts/tick-checkpoint/program.elf",
+  "backend": "DNS / stock bind",
+  "elf": "artifacts/rv32/doom-small.elf",
   "status": "checkpoint-returned",
   "exit_code": null,
   "frames": 0,
   "instructions": 1389327,
-  "elapsed": 576.7471829089336,
+  "elapsed": 55.62857468100265,
   "pc": "0004af70",
   "registers": {
     "r00": "00000000",
@@ -41,8 +41,8 @@
     "r30": "0109c000",
     "r31": "00000000"
   },
-  "dns_transactions": 16173013,
-  "payload_bytes": 2746730548,
+  "dns_transactions": 6962678,
+  "payload_bytes": 1500371259,
   "instruction_counts": {
     "LUI": 22196,
     "LW": 69846,
@@ -83,1696 +83,1072 @@
   },
   "milestones": [
     {
-      "instructions": 11569,
-      "pc": "0004c14c",
+      "instructions": 119041,
+      "pc": "0004c214",
       "elapsed": 5.0,
-      "dns_transactions": 139008
+      "dns_transactions": 500490
     },
     {
-      "instructions": 22720,
-      "pc": "00013ebc",
+      "instructions": 240966,
+      "pc": "0004afcc",
       "elapsed": 10.0,
-      "dns_transactions": 284487
+      "dns_transactions": 1181217
     },
     {
-      "instructions": 35358,
-      "pc": "00013eb8",
+      "instructions": 368331,
+      "pc": "00044fcc",
       "elapsed": 15.0,
-      "dns_transactions": 419104
+      "dns_transactions": 1885255
     },
     {
-      "instructions": 48142,
-      "pc": "00013ec4",
+      "instructions": 494600,
+      "pc": "0004c200",
       "elapsed": 20.0,
-      "dns_transactions": 555323
+      "dns_transactions": 2595368
     },
     {
-      "instructions": 60581,
-      "pc": "0001b52c",
+      "instructions": 618175,
+      "pc": "0004c204",
       "elapsed": 25.0,
-      "dns_transactions": 688765
+      "dns_transactions": 3300815
     },
     {
-      "instructions": 72567,
-      "pc": "00022120",
+      "instructions": 743814,
+      "pc": "0004c214",
       "elapsed": 30.0,
-      "dns_transactions": 827713
+      "dns_transactions": 3987517
     },
     {
-      "instructions": 84959,
-      "pc": "00028cac",
+      "instructions": 866214,
+      "pc": "0004c214",
       "elapsed": 35.0,
-      "dns_transactions": 963917
+      "dns_transactions": 4666383
     },
     {
-      "instructions": 96943,
-      "pc": "0004c14c",
+      "instructions": 997609,
+      "pc": "00020a04",
       "elapsed": 40.0,
-      "dns_transactions": 1104158
+      "dns_transactions": 5383492
     },
     {
-      "instructions": 109331,
-      "pc": "0004c180",
+      "instructions": 1126086,
+      "pc": "00044be4",
       "elapsed": 45.0,
-      "dns_transactions": 1243849
+      "dns_transactions": 6098140
     },
     {
-      "instructions": 121723,
-      "pc": "0004c1e8",
+      "instructions": 1247508,
+      "pc": "0001b3d0",
       "elapsed": 50.0,
-      "dns_transactions": 1384247
+      "dns_transactions": 6523115
     },
     {
-      "instructions": 134076,
-      "pc": "0004ba64",
+      "instructions": 1373410,
+      "pc": "0001b414",
       "elapsed": 55.0,
-      "dns_transactions": 1523609
-    },
-    {
-      "instructions": 146300,
-      "pc": "0004bb68",
-      "elapsed": 60.0,
-      "dns_transactions": 1664889
-    },
-    {
-      "instructions": 157758,
-      "pc": "000214c4",
-      "elapsed": 65.0,
-      "dns_transactions": 1810568
-    },
-    {
-      "instructions": 170190,
-      "pc": "0004c238",
-      "elapsed": 70.0,
-      "dns_transactions": 1952097
-    },
-    {
-      "instructions": 182250,
-      "pc": "0004c138",
-      "elapsed": 75.0,
-      "dns_transactions": 2092766
-    },
-    {
-      "instructions": 194377,
-      "pc": "0004c200",
-      "elapsed": 80.0,
-      "dns_transactions": 2233943
-    },
-    {
-      "instructions": 206591,
-      "pc": "0004c14c",
-      "elapsed": 85.0,
-      "dns_transactions": 2372074
-    },
-    {
-      "instructions": 218158,
-      "pc": "0004c1a4",
-      "elapsed": 90.0,
-      "dns_transactions": 2517533
-    },
-    {
-      "instructions": 230006,
-      "pc": "0004c19c",
-      "elapsed": 95.0,
-      "dns_transactions": 2654482
-    },
-    {
-      "instructions": 241796,
-      "pc": "0004c200",
-      "elapsed": 100.0,
-      "dns_transactions": 2794898
-    },
-    {
-      "instructions": 253859,
-      "pc": "0004c20c",
-      "elapsed": 105.0,
-      "dns_transactions": 2936854
-    },
-    {
-      "instructions": 266235,
-      "pc": "0004c17c",
-      "elapsed": 110.0,
-      "dns_transactions": 3077588
-    },
-    {
-      "instructions": 277777,
-      "pc": "000214c8",
-      "elapsed": 115.0,
-      "dns_transactions": 3214869
-    },
-    {
-      "instructions": 290035,
-      "pc": "0004c09c",
-      "elapsed": 120.01,
-      "dns_transactions": 3354109
-    },
-    {
-      "instructions": 302298,
-      "pc": "000270a4",
-      "elapsed": 125.01,
-      "dns_transactions": 3494791
-    },
-    {
-      "instructions": 314179,
-      "pc": "0004c208",
-      "elapsed": 130.01,
-      "dns_transactions": 3633037
-    },
-    {
-      "instructions": 326473,
-      "pc": "0001fe3c",
-      "elapsed": 135.01,
-      "dns_transactions": 3772846
-    },
-    {
-      "instructions": 338051,
-      "pc": "0004bc30",
-      "elapsed": 140.01,
-      "dns_transactions": 3916093
-    },
-    {
-      "instructions": 350192,
-      "pc": "0004c224",
-      "elapsed": 145.01,
-      "dns_transactions": 4055339
-    },
-    {
-      "instructions": 362239,
-      "pc": "0004c208",
-      "elapsed": 150.01,
-      "dns_transactions": 4196378
-    },
-    {
-      "instructions": 374289,
-      "pc": "00045304",
-      "elapsed": 155.01,
-      "dns_transactions": 4337670
-    },
-    {
-      "instructions": 385575,
-      "pc": "0004c19c",
-      "elapsed": 160.01,
-      "dns_transactions": 4475014
-    },
-    {
-      "instructions": 397440,
-      "pc": "0004c084",
-      "elapsed": 165.01,
-      "dns_transactions": 4615020
-    },
-    {
-      "instructions": 409813,
-      "pc": "0004c194",
-      "elapsed": 170.01,
-      "dns_transactions": 4755772
-    },
-    {
-      "instructions": 421631,
-      "pc": "0004c08c",
-      "elapsed": 175.01,
-      "dns_transactions": 4898584
-    },
-    {
-      "instructions": 434014,
-      "pc": "0004c194",
-      "elapsed": 180.01,
-      "dns_transactions": 5039501
-    },
-    {
-      "instructions": 446269,
-      "pc": "0004b9d0",
-      "elapsed": 185.01,
-      "dns_transactions": 5181233
-    },
-    {
-      "instructions": 458263,
-      "pc": "0004536c",
-      "elapsed": 190.01,
-      "dns_transactions": 5323410
-    },
-    {
-      "instructions": 470115,
-      "pc": "0004b06c",
-      "elapsed": 195.01,
-      "dns_transactions": 5465300
-    },
-    {
-      "instructions": 482194,
-      "pc": "0004c214",
-      "elapsed": 200.01,
-      "dns_transactions": 5607333
-    },
-    {
-      "instructions": 494441,
-      "pc": "0004c214",
-      "elapsed": 205.01,
-      "dns_transactions": 5747771
-    },
-    {
-      "instructions": 506749,
-      "pc": "0004c220",
-      "elapsed": 210.01,
-      "dns_transactions": 5889120
-    },
-    {
-      "instructions": 519007,
-      "pc": "00044f8c",
-      "elapsed": 215.01,
-      "dns_transactions": 6027432
-    },
-    {
-      "instructions": 530393,
-      "pc": "00033800",
-      "elapsed": 220.01,
-      "dns_transactions": 6170237
-    },
-    {
-      "instructions": 541959,
-      "pc": "0004c1a4",
-      "elapsed": 225.01,
-      "dns_transactions": 6313017
-    },
-    {
-      "instructions": 553844,
-      "pc": "0004b4b8",
-      "elapsed": 230.01,
-      "dns_transactions": 6456300
-    },
-    {
-      "instructions": 566142,
-      "pc": "000450ec",
-      "elapsed": 235.01,
-      "dns_transactions": 6597224
-    },
-    {
-      "instructions": 577687,
-      "pc": "0004c228",
-      "elapsed": 240.01,
-      "dns_transactions": 6741028
-    },
-    {
-      "instructions": 589952,
-      "pc": "0004c138",
-      "elapsed": 245.01,
-      "dns_transactions": 6883043
-    },
-    {
-      "instructions": 601887,
-      "pc": "0004c150",
-      "elapsed": 250.01,
-      "dns_transactions": 7025103
-    },
-    {
-      "instructions": 613982,
-      "pc": "0004c20c",
-      "elapsed": 255.01,
-      "dns_transactions": 7164109
-    },
-    {
-      "instructions": 626346,
-      "pc": "000450d8",
-      "elapsed": 260.01,
-      "dns_transactions": 7304684
-    },
-    {
-      "instructions": 638442,
-      "pc": "0004b96c",
-      "elapsed": 265.01,
-      "dns_transactions": 7446204
-    },
-    {
-      "instructions": 650323,
-      "pc": "000452c8",
-      "elapsed": 270.01,
-      "dns_transactions": 7586357
-    },
-    {
-      "instructions": 662068,
-      "pc": "0004c220",
-      "elapsed": 275.01,
-      "dns_transactions": 7728885
-    },
-    {
-      "instructions": 674382,
-      "pc": "0004c220",
-      "elapsed": 280.01,
-      "dns_transactions": 7869705
-    },
-    {
-      "instructions": 686549,
-      "pc": "0004605c",
-      "elapsed": 285.01,
-      "dns_transactions": 8008268
-    },
-    {
-      "instructions": 698901,
-      "pc": "0004c218",
-      "elapsed": 290.01,
-      "dns_transactions": 8149615
-    },
-    {
-      "instructions": 710773,
-      "pc": "00045244",
-      "elapsed": 295.01,
-      "dns_transactions": 8292463
-    },
-    {
-      "instructions": 723076,
-      "pc": "0004c148",
-      "elapsed": 300.01,
-      "dns_transactions": 8434038
-    },
-    {
-      "instructions": 735334,
-      "pc": "0004c220",
-      "elapsed": 305.01,
-      "dns_transactions": 8576244
-    },
-    {
-      "instructions": 747777,
-      "pc": "0004ba3c",
-      "elapsed": 310.01,
-      "dns_transactions": 8717451
-    },
-    {
-      "instructions": 759666,
-      "pc": "0004507c",
-      "elapsed": 315.02,
-      "dns_transactions": 8858460
-    },
-    {
-      "instructions": 771626,
-      "pc": "0004c13c",
-      "elapsed": 320.02,
-      "dns_transactions": 8999555
-    },
-    {
-      "instructions": 783532,
-      "pc": "0004c208",
-      "elapsed": 325.02,
-      "dns_transactions": 9140422
-    },
-    {
-      "instructions": 795566,
-      "pc": "0004c228",
-      "elapsed": 330.02,
-      "dns_transactions": 9279643
-    },
-    {
-      "instructions": 807460,
-      "pc": "0004c160",
-      "elapsed": 335.02,
-      "dns_transactions": 9413792
-    },
-    {
-      "instructions": 819387,
-      "pc": "0004c144",
-      "elapsed": 340.02,
-      "dns_transactions": 9557144
-    },
-    {
-      "instructions": 831644,
-      "pc": "0004c1fc",
-      "elapsed": 345.02,
-      "dns_transactions": 9698379
-    },
-    {
-      "instructions": 843854,
-      "pc": "0004c208",
-      "elapsed": 350.02,
-      "dns_transactions": 9840604
-    },
-    {
-      "instructions": 856187,
-      "pc": "000467c4",
-      "elapsed": 355.02,
-      "dns_transactions": 9982046
-    },
-    {
-      "instructions": 868108,
-      "pc": "0004c2c8",
-      "elapsed": 360.02,
-      "dns_transactions": 10125256
-    },
-    {
-      "instructions": 880156,
-      "pc": "00019490",
-      "elapsed": 365.02,
-      "dns_transactions": 10266950
-    },
-    {
-      "instructions": 892152,
-      "pc": "0004c1d4",
-      "elapsed": 370.02,
-      "dns_transactions": 10407564
-    },
-    {
-      "instructions": 904189,
-      "pc": "0004c228",
-      "elapsed": 375.02,
-      "dns_transactions": 10548539
-    },
-    {
-      "instructions": 915920,
-      "pc": "0004c184",
-      "elapsed": 380.02,
-      "dns_transactions": 10690017
-    },
-    {
-      "instructions": 926781,
-      "pc": "0004c198",
-      "elapsed": 385.02,
-      "dns_transactions": 10833324
-    },
-    {
-      "instructions": 938318,
-      "pc": "0002120c",
-      "elapsed": 390.02,
-      "dns_transactions": 10974626
-    },
-    {
-      "instructions": 949903,
-      "pc": "00020a44",
-      "elapsed": 395.02,
-      "dns_transactions": 11117682
-    },
-    {
-      "instructions": 961420,
-      "pc": "00020a44",
-      "elapsed": 400.02,
-      "dns_transactions": 11260083
-    },
-    {
-      "instructions": 972926,
-      "pc": "0004c184",
-      "elapsed": 405.02,
-      "dns_transactions": 11402157
-    },
-    {
-      "instructions": 984447,
-      "pc": "000212fc",
-      "elapsed": 410.02,
-      "dns_transactions": 11544062
-    },
-    {
-      "instructions": 995390,
-      "pc": "0004c1a0",
-      "elapsed": 415.02,
-      "dns_transactions": 11687544
-    },
-    {
-      "instructions": 1006981,
-      "pc": "000209c8",
-      "elapsed": 420.02,
-      "dns_transactions": 11829556
-    },
-    {
-      "instructions": 1018399,
-      "pc": "00020a04",
-      "elapsed": 425.02,
-      "dns_transactions": 11970377
-    },
-    {
-      "instructions": 1029880,
-      "pc": "00020a04",
-      "elapsed": 430.02,
-      "dns_transactions": 12112382
-    },
-    {
-      "instructions": 1041402,
-      "pc": "0002128c",
-      "elapsed": 435.02,
-      "dns_transactions": 12254938
-    },
-    {
-      "instructions": 1053086,
-      "pc": "0004c180",
-      "elapsed": 440.02,
-      "dns_transactions": 12397806
-    },
-    {
-      "instructions": 1064374,
-      "pc": "000213dc",
-      "elapsed": 445.02,
-      "dns_transactions": 12538666
-    },
-    {
-      "instructions": 1074931,
-      "pc": "0004c18c",
-      "elapsed": 450.02,
-      "dns_transactions": 12680897
-    },
-    {
-      "instructions": 1085598,
-      "pc": "000212c8",
-      "elapsed": 455.02,
-      "dns_transactions": 12824094
-    },
-    {
-      "instructions": 1096558,
-      "pc": "0004c13c",
-      "elapsed": 460.02,
-      "dns_transactions": 12966380
-    },
-    {
-      "instructions": 1108240,
-      "pc": "0004c180",
-      "elapsed": 465.02,
-      "dns_transactions": 13106723
-    },
-    {
-      "instructions": 1119173,
-      "pc": "00020e0c",
-      "elapsed": 470.02,
-      "dns_transactions": 13247152
-    },
-    {
-      "instructions": 1130247,
-      "pc": "0001a014",
-      "elapsed": 475.02,
-      "dns_transactions": 13393695
-    },
-    {
-      "instructions": 1141725,
-      "pc": "0001a048",
-      "elapsed": 480.03,
-      "dns_transactions": 13536879
-    },
-    {
-      "instructions": 1154375,
-      "pc": "0001b398",
-      "elapsed": 485.03,
-      "dns_transactions": 13673788
-    },
-    {
-      "instructions": 1167256,
-      "pc": "0001b39c",
-      "elapsed": 490.03,
-      "dns_transactions": 13810326
-    },
-    {
-      "instructions": 1180095,
-      "pc": "0001b398",
-      "elapsed": 495.03,
-      "dns_transactions": 13946420
-    },
-    {
-      "instructions": 1192970,
-      "pc": "0001b398",
-      "elapsed": 500.03,
-      "dns_transactions": 14082895
-    },
-    {
-      "instructions": 1205860,
-      "pc": "0001b398",
-      "elapsed": 505.03,
-      "dns_transactions": 14219529
-    },
-    {
-      "instructions": 1218658,
-      "pc": "0001b390",
-      "elapsed": 510.03,
-      "dns_transactions": 14355191
-    },
-    {
-      "instructions": 1231576,
-      "pc": "0001b39c",
-      "elapsed": 515.03,
-      "dns_transactions": 14492118
-    },
-    {
-      "instructions": 1244431,
-      "pc": "0001b3d8",
-      "elapsed": 520.03,
-      "dns_transactions": 14628422
-    },
-    {
-      "instructions": 1256702,
-      "pc": "0001b3dc",
-      "elapsed": 525.03,
-      "dns_transactions": 14758494
-    },
-    {
-      "instructions": 1269370,
-      "pc": "0001b3d4",
-      "elapsed": 530.03,
-      "dns_transactions": 14892777
-    },
-    {
-      "instructions": 1282136,
-      "pc": "0001b3d8",
-      "elapsed": 535.03,
-      "dns_transactions": 15028095
-    },
-    {
-      "instructions": 1295008,
-      "pc": "0001b3e0",
-      "elapsed": 540.03,
-      "dns_transactions": 15164542
-    },
-    {
-      "instructions": 1307897,
-      "pc": "0001b3dc",
-      "elapsed": 545.03,
-      "dns_transactions": 15301161
-    },
-    {
-      "instructions": 1320838,
-      "pc": "0001b3e0",
-      "elapsed": 550.03,
-      "dns_transactions": 15438340
-    },
-    {
-      "instructions": 1333650,
-      "pc": "0001b3d4",
-      "elapsed": 555.03,
-      "dns_transactions": 15574145
-    },
-    {
-      "instructions": 1346527,
-      "pc": "0001b418",
-      "elapsed": 560.03,
-      "dns_transactions": 15711098
-    },
-    {
-      "instructions": 1359389,
-      "pc": "0001b420",
-      "elapsed": 565.03,
-      "dns_transactions": 15847939
-    },
-    {
-      "instructions": 1372121,
-      "pc": "0001b400",
-      "elapsed": 570.03,
-      "dns_transactions": 15983453
-    },
-    {
-      "instructions": 1384994,
-      "pc": "0001b420",
-      "elapsed": 575.03,
-      "dns_transactions": 16120410
+      "dns_transactions": 6907682
     }
   ],
   "sample_dns_requests": [
     {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
+      "name": "state.reg",
+      "request_bytes": 35,
+      "response_bytes": 313
     },
     {
       "name": "00048ddc.code",
       "request_bytes": 39,
-      "response_bytes": 206
-    },
-    {
-      "name": "UPDATE",
-      "request_bytes": 123,
-      "response_bytes": 25
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "00048de0.code",
-      "request_bytes": 39,
-      "response_bytes": 1553
-    },
-    {
-      "name": "r15.reg",
-      "request_bytes": 33,
-      "response_bytes": 87
+      "response_bytes": 4829
     },
     {
       "name": "00.74.0.add",
       "request_bytes": 37,
-      "response_bytes": 86
+      "response_bytes": 53
     },
     {
-      "name": "10.fe.0.add",
+      "name": "00.75.0.add",
       "request_bytes": 37,
-      "response_bytes": 86
+      "response_bytes": 53
     },
     {
-      "name": "07.ff.1.add",
+      "name": "00.76.0.add",
       "request_bytes": 37,
-      "response_bytes": 86
+      "response_bytes": 53
     },
     {
-      "name": "00.ff.1.add",
+      "name": "00.77.0.add",
       "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "00070e74.mem",
-      "request_bytes": 38,
-      "response_bytes": 86
-    },
-    {
-      "name": "74.01.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "0e.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "00.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "00070e75.mem",
-      "request_bytes": 38,
-      "response_bytes": 86
-    },
-    {
-      "name": "75.01.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "0e.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "00.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "00070e76.mem",
-      "request_bytes": 38,
-      "response_bytes": 86
-    },
-    {
-      "name": "76.01.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "0e.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "00.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "00070e77.mem",
-      "request_bytes": 38,
-      "response_bytes": 86
-    },
-    {
-      "name": "UPDATE",
-      "request_bytes": 123,
-      "response_bytes": 25
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "00048de4.code",
-      "request_bytes": 39,
-      "response_bytes": 509
-    },
-    {
-      "name": "r02.reg",
-      "request_bytes": 33,
-      "response_bytes": 87
+      "response_bytes": 53
     },
     {
       "name": "b0.f0.0.add",
       "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.ff.1.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.ff.1.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.ff.1.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "UPDATE",
-      "request_bytes": 123,
-      "response_bytes": 25
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "00048de8.code",
-      "request_bytes": 39,
-      "response_bytes": 1520
-    },
-    {
-      "name": "r02.reg",
-      "request_bytes": 33,
-      "response_bytes": 87
-    },
-    {
-      "name": "a0.0c.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "r01.reg",
-      "request_bytes": 33,
-      "response_bytes": 87
-    },
-    {
-      "name": "ac.01.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ad.01.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ae.01.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "UPDATE",
-      "request_bytes": 234,
-      "response_bytes": 25
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "00048dec.code",
-      "request_bytes": 39,
-      "response_bytes": 1520
-    },
-    {
-      "name": "r02.reg",
-      "request_bytes": 33,
-      "response_bytes": 87
-    },
-    {
-      "name": "a0.04.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "r09.reg",
-      "request_bytes": 33,
-      "response_bytes": 87
-    },
-    {
-      "name": "a4.01.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "a5.01.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "a6.01.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "UPDATE",
-      "request_bytes": 234,
-      "response_bytes": 25
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "00048df0.code",
-      "request_bytes": 39,
-      "response_bytes": 673
-    },
-    {
-      "name": "r15.reg",
-      "request_bytes": 33,
-      "response_bytes": 87
-    },
-    {
-      "name": "00.00.eq.cmp",
-      "request_bytes": 38,
-      "response_bytes": 86
-    },
-    {
-      "name": "00.00.eq.cmp",
-      "request_bytes": 38,
-      "response_bytes": 86
-    },
-    {
-      "name": "00.00.eq.cmp",
-      "request_bytes": 38,
-      "response_bytes": 86
-    },
-    {
-      "name": "01.00.eq.cmp",
-      "request_bytes": 38,
-      "response_bytes": 86
-    },
-    {
-      "name": "gt.eq.cond",
-      "request_bytes": 36,
-      "response_bytes": 83
-    },
-    {
-      "name": "00.00.0.mux",
-      "request_bytes": 37,
-      "response_bytes": 85
-    },
-    {
-      "name": "04.04.0.mux",
-      "request_bytes": 37,
-      "response_bytes": 85
-    },
-    {
-      "name": "8d.8e.0.mux",
-      "request_bytes": 37,
-      "response_bytes": 85
-    },
-    {
-      "name": "f4.d4.0.mux",
-      "request_bytes": 37,
-      "response_bytes": 85
-    },
-    {
-      "name": "UPDATE",
-      "request_bytes": 86,
-      "response_bytes": 25
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "00048df4.code",
-      "request_bytes": 39,
-      "response_bytes": 1520
-    },
-    {
-      "name": "r02.reg",
-      "request_bytes": 33,
-      "response_bytes": 87
-    },
-    {
-      "name": "a0.08.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "r08.reg",
-      "request_bytes": 33,
-      "response_bytes": 87
-    },
-    {
-      "name": "a8.01.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "a9.01.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "aa.01.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "UPDATE",
-      "request_bytes": 234,
-      "response_bytes": 25
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "00048df8.code",
-      "request_bytes": 39,
-      "response_bytes": 1520
-    },
-    {
-      "name": "r02.reg",
-      "request_bytes": 33,
-      "response_bytes": 87
-    },
-    {
-      "name": "a0.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "r18.reg",
-      "request_bytes": 33,
-      "response_bytes": 87
-    },
-    {
-      "name": "a0.01.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "a1.01.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "a2.01.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "UPDATE",
-      "request_bytes": 234,
-      "response_bytes": 25
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "00048dfc.code",
-      "request_bytes": 39,
-      "response_bytes": 206
-    },
-    {
-      "name": "UPDATE",
-      "request_bytes": 123,
-      "response_bytes": 25
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "00048e00.code",
-      "request_bytes": 39,
-      "response_bytes": 206
-    },
-    {
-      "name": "UPDATE",
-      "request_bytes": 123,
-      "response_bytes": 25
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "000411d0.code",
-      "request_bytes": 39,
-      "response_bytes": 206
-    },
-    {
-      "name": "UPDATE",
-      "request_bytes": 123,
-      "response_bytes": 25
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "000411d4.code",
-      "request_bytes": 39,
-      "response_bytes": 1553
-    },
-    {
-      "name": "r15.reg",
-      "request_bytes": 33,
-      "response_bytes": 87
-    },
-    {
-      "name": "00.6c.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
+      "response_bytes": 53
     },
     {
       "name": "10.fe.0.add",
       "request_bytes": 37,
-      "response_bytes": 86
+      "response_bytes": 53
+    },
+    {
+      "name": "10.fe.0.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "10.fe.0.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "10.fe.0.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "ff.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
     },
     {
       "name": "07.ff.1.add",
       "request_bytes": 37,
-      "response_bytes": 86
+      "response_bytes": 53
+    },
+    {
+      "name": "07.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "07.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "07.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "ff.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
     },
     {
       "name": "00.ff.1.add",
       "request_bytes": 37,
-      "response_bytes": 86
+      "response_bytes": 53
     },
     {
-      "name": "00070e6c.mem",
-      "request_bytes": 38,
-      "response_bytes": 86
-    },
-    {
-      "name": "6c.01.0.add",
+      "name": "00.ff.1.add",
       "request_bytes": 37,
-      "response_bytes": 86
+      "response_bytes": 53
     },
     {
-      "name": "0e.00.0.add",
+      "name": "00.ff.1.add",
       "request_bytes": 37,
-      "response_bytes": 86
+      "response_bytes": 53
     },
     {
-      "name": "07.00.0.add",
+      "name": "00.ff.1.add",
       "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "00.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "00070e6d.mem",
-      "request_bytes": 38,
-      "response_bytes": 86
-    },
-    {
-      "name": "6d.01.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "0e.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "00.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "00070e6e.mem",
-      "request_bytes": 38,
-      "response_bytes": 86
-    },
-    {
-      "name": "6e.01.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "0e.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "07.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "00.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "00070e6f.mem",
-      "request_bytes": 38,
-      "response_bytes": 86
-    },
-    {
-      "name": "UPDATE",
-      "request_bytes": 123,
-      "response_bytes": 25
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "000411d8.code",
-      "request_bytes": 39,
-      "response_bytes": 509
-    },
-    {
-      "name": "r02.reg",
-      "request_bytes": 33,
-      "response_bytes": 87
-    },
-    {
-      "name": "a0.e0.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.ff.1.add",
-      "request_bytes": 37,
-      "response_bytes": 86
-    },
-    {
-      "name": "ff.ff.1.add",
-      "request_bytes": 37,
-      "response_bytes": 86
+      "response_bytes": 53
     },
     {
       "name": "07.ff.1.add",
       "request_bytes": 37,
-      "response_bytes": 86
+      "response_bytes": 53
+    },
+    {
+      "name": "00070e74.mem",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "00070e75.mem",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "00070e76.mem",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "00070e77.mem",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "ffa0.0000000c.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ffa0.0000000d.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ffa0.0000000e.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ffa0.0000000f.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ffa0.00000004.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ffa0.00000005.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ffa0.00000006.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ffa0.00000007.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "00.00.eq.cmp",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "00.00.eq.cmp",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "00.00.eq.cmp",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "01.00.eq.cmp",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "eq.eq.eq.gt.eq.cond4",
+      "request_bytes": 46,
+      "response_bytes": 60
+    },
+    {
+      "name": "8d.8e.0.mux",
+      "request_bytes": 37,
+      "response_bytes": 52
+    },
+    {
+      "name": "f4.d4.0.mux",
+      "request_bytes": 37,
+      "response_bytes": 52
     },
     {
       "name": "UPDATE",
-      "request_bytes": 123,
+      "request_bytes": 1180,
       "response_bytes": 25
     },
     {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "pc.reg",
-      "request_bytes": 32,
-      "response_bytes": 86
-    },
-    {
-      "name": "000411dc.code",
+      "name": "00048df4.code",
       "request_bytes": 39,
-      "response_bytes": 1520
+      "response_bytes": 2262
     },
     {
-      "name": "r02.reg",
-      "request_bytes": 33,
-      "response_bytes": 87
+      "name": "ffa0.00000008.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
     },
     {
-      "name": "80.1c.0.add",
+      "name": "ffa0.00000009.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ffa0.0000000a.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ffa0.0000000b.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ffa0.00000001.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ffa0.00000002.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ffa0.00000003.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 1180,
+      "response_bytes": 25
+    },
+    {
+      "name": "000411d0.code",
+      "request_bytes": 39,
+      "response_bytes": 4198
+    },
+    {
+      "name": "00.6c.0.add",
       "request_bytes": 37,
-      "response_bytes": 86
+      "response_bytes": 53
     },
     {
-      "name": "ff.00.0.add",
+      "name": "00.6d.0.add",
       "request_bytes": 37,
-      "response_bytes": 86
+      "response_bytes": 53
     },
     {
-      "name": "ff.00.0.add",
+      "name": "00.6e.0.add",
       "request_bytes": 37,
-      "response_bytes": 86
+      "response_bytes": 53
     },
     {
-      "name": "07.00.0.add",
+      "name": "00.6f.0.add",
       "request_bytes": 37,
-      "response_bytes": 86
+      "response_bytes": 53
     },
     {
-      "name": "r01.reg",
-      "request_bytes": 33,
-      "response_bytes": 87
-    },
-    {
-      "name": "9c.01.0.add",
+      "name": "a0.e0.0.add",
       "request_bytes": 37,
-      "response_bytes": 86
+      "response_bytes": 53
     },
     {
-      "name": "ff.00.0.add",
-      "request_bytes": 37,
-      "response_bytes": 86
+      "name": "0000.00000002.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
     },
     {
-      "name": "ff.00.0.add",
+      "name": "10.fe.0.add",
       "request_bytes": 37,
-      "response_bytes": 86
+      "response_bytes": 53
     },
     {
-      "name": "07.00.0.add",
+      "name": "10.fe.0.add",
       "request_bytes": 37,
-      "response_bytes": 86
+      "response_bytes": 53
     },
     {
-      "name": "9d.01.0.add",
+      "name": "10.fe.0.add",
       "request_bytes": 37,
-      "response_bytes": 86
+      "response_bytes": 53
     },
     {
-      "name": "ff.00.0.add",
+      "name": "10.fe.0.add",
       "request_bytes": 37,
-      "response_bytes": 86
+      "response_bytes": 53
+    },
+    {
+      "name": "ff.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "0000.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "07.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "07.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "07.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "ff.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "00.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "00.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "00.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "00.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "07.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "00070e6c.mem",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "00070e6d.mem",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "00070e6e.mem",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "00070e6f.mem",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "ff80.0000001c.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ff80.0000001d.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ff80.0000001e.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ff80.0000001f.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "00.00.eq.cmp",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "00.00.eq.cmp",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "00.00.eq.cmp",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "00.02.eq.cmp",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "eq.eq.eq.lt.eq.cond4",
+      "request_bytes": 46,
+      "response_bytes": 60
+    },
+    {
+      "name": "11.12.0.mux",
+      "request_bytes": 37,
+      "response_bytes": 52
+    },
+    {
+      "name": "e8.7c.0.mux",
+      "request_bytes": 37,
+      "response_bytes": 52
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 912,
+      "response_bytes": 25
+    },
+    {
+      "name": "000411e8.code",
+      "request_bytes": 39,
+      "response_bytes": 1438
+    },
+    {
+      "name": "ff80.00000014.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ff80.00000015.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ff80.00000016.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ff80.00000017.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 912,
+      "response_bytes": 25
+    },
+    {
+      "name": "000411ec.code",
+      "request_bytes": 39,
+      "response_bytes": 1440
+    },
+    {
+      "name": "ff80.00000008.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ff80.00000009.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ff80.0000000a.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ff80.0000000b.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 912,
+      "response_bytes": 25
+    },
+    {
+      "name": "000411f0.code",
+      "request_bytes": 39,
+      "response_bytes": 6631
+    },
+    {
+      "name": "00.00.0.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "00.01.0.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "00.02.0.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "00.03.0.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "00.04.0.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "00.05.0.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "00.06.0.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "00.07.0.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "ff80.00000010.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ff80.00000011.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ff80.00000012.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ff80.00000013.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ff80.0000000c.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ff80.0000000d.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ff80.0000000e.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "ff80.0000000f.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "00.08.0.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "1000.ffffffff.add16",
+      "request_bytes": 45,
+      "response_bytes": 63
+    },
+    {
+      "name": "60.fb.0.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "60.fb.0.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "60.fb.0.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "60.fb.0.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "60.fb.0.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "60.fb.0.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "60.fb.0.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "60.fb.0.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "07ff.0.inc16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "60.fb.0.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "0000.0.dec16",
+      "request_bytes": 38,
+      "response_bytes": 55
+    },
+    {
+      "name": "0c.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "0c.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "0c.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "0c.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "0c.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "0c.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "0c.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "0c.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "0c.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "01.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "01.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "01.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "01.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "01.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "01.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "01.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "01.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "01.ff.1.add",
+      "request_bytes": 37,
+      "response_bytes": 53
+    },
+    {
+      "name": "010c5b00.mem",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "010c5b01.mem",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "010c5b02.mem",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "010c5b03.mem",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "010c5b04.mem",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "010c5b05.mem",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "010c5b06.mem",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "010c5b07.mem",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "00.00.eq.cmp",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "00.00.eq.cmp",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "00.00.eq.cmp",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "00.01.eq.cmp",
+      "request_bytes": 38,
+      "response_bytes": 53
+    },
+    {
+      "name": "eq.eq.eq.lt.eq.cond4",
+      "request_bytes": 46,
+      "response_bytes": 60
+    },
+    {
+      "name": "1c.90.0.mux",
+      "request_bytes": 37,
+      "response_bytes": 52
+    },
+    {
+      "name": "UPDATE",
+      "request_bytes": 1180,
+      "response_bytes": 25
+    },
+    {
+      "name": "0004121c.code",
+      "request_bytes": 39,
+      "response_bytes": 1589
     }
   ],
   "messages": [],
@@ -1796,6 +1172,25 @@
   },
   "pixels_sha256": "f7e0d2837e829a66a8359b6a15b50a1ef4de45a58f3b3588f059f0e49ea57f46",
   "checkpoint_symbol": "D_DoomLoop",
+  "reference_registers_match": true,
+  "reference_game_state_match": true,
+  "reference_pc_match": true,
   "checkpoint_origin": "LOCAL REFERENCE INITIALIZATION \u2014 not DNS",
-  "elf_sha256": "148fa2f64b12508e8ff3313c592ebe7ef9f607371af474b0a7267d943a0157c2"
+  "elf_sha256": "63f16f561bad07c87434ad9416377ac171b49efafcbf076cbbd99865d83a030f",
+  "client": "native",
+  "optimization": {
+    "pipeline": true,
+    "packed": true,
+    "wiring": true,
+    "blocks": true,
+    "sequencer": "native",
+    "connections": 1,
+    "dns_threads": 1,
+    "transport": "udp",
+    "commit_every": 8
+  },
+  "wiring_revision": 4,
+  "clock_cycles": 284757,
+  "preview_interval": 5.0,
+  "network_batches": 1854410
 }

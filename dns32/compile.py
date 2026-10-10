@@ -3,7 +3,12 @@
 import struct
 import hashlib
 
-FAST_OFFSETS=(-32,-16,-8,-4,-2,-1,1,2,3,4,8,12,16,32,64)
+# Chosen from the measured constant-add histogram of the verified Doom tick
+# (artifacts/performance/offsets.txt): these 64 offsets cover about 84% of the
+# constant additions the tick performs. Each costs 65,536 add16 records.
+FAST_OFFSETS=(-1236,-1235,-1234,-1233,-1232,-1231,-1230,-1229,-1228,-1227,-1226,-1225,-1216,-1215,-1214,-1213,
+              -320,-1,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,
+              33,36,37,38,39,40,41,42,43,44,45,46,47,320)
 
 
 def sx(n, width):
@@ -91,9 +96,27 @@ class Wiring:
     def condition(self, comparison, condition):
         return self.query(comparison, ".", condition, ".cond")
 
+    def decide(self, a, b, condition, signed=False):
+        """Condition bit for a comparison: two stages when optimized, five otherwise."""
+        if not self.optimize:
+            return self.condition(self.compare(a, b, signed), condition)
+        if a == "00000000" or b == "00000000":
+            # Comparisons against x0 use 16-bit half tables: two lookups, then the condition.
+            high=self.query(self.cut(a,0,4),".",self.cut(b,0,4),".","scmp16" if signed else "cmp16")
+            low=self.query(self.cut(a,4,8),".",self.cut(b,4,8),".cmp16")
+            return self.query(high,".",low,".",condition,".cond2")
+        # All four byte comparisons in one stage; one lookup then picks the most
+        # significant difference and applies the condition.
+        bytes_=[self.query(self.cut(a,o,o+2),".",self.cut(b,o,o+2),".eq.","scmp" if signed and o==0 else "cmp") for o in (0,2,4,6)]
+        return self.query(bytes_[0],".",bytes_[1],".",bytes_[2],".",bytes_[3],".",condition,".cond4")
+
     def mux(self, cond, a, b):
-        return self.copy(*[self.query(self.cut(a,i,i+2), ".", self.cut(b,i,i+2), ".", cond, ".mux")
-                           for i in (0,2,4,6)])
+        parts=[]
+        for i in (0,2,4,6):
+            if self.optimize and isinstance(a,str) and isinstance(b,str) and a[i:i+2]==b[i:i+2]:
+                parts.append(a[i:i+2])   # both candidates agree on this byte; nothing to select
+            else:parts.append(self.query(self.cut(a,i,i+2), ".", self.cut(b,i,i+2), ".", cond, ".mux"))
+        return self.copy(*parts)
 
     def shift_fixed(self, a, amount, kind):
         if amount == 0:
@@ -130,22 +153,18 @@ class Wiring:
             a = self.mux(self.cut(controls,index,index+1), a, self.shift_fixed(a,amount,kind))
         return a
 
-    def load(self, address, size, signed):
-        values = []
-        current = address
-        for index in range(size):
-            values.append(self.query(current, ".mem"))
-            if index + 1 < size:
-                current = self.alu("add", current, "00000001")
+    def address(self, base, offset, index):
+        # Every byte address is base plus one constant, so all of them share the same stages.
+        return self.alu("add", base, word(offset + index))
+
+    def load(self, base, offset, size, signed):
+        values = [self.query(self.address(base, offset, index), ".mem") for index in range(size)]
         fill = self.query(values[-1], ".sign") if signed and size < 4 else "00"
         return self.copy(*([fill] * (4-size)), *reversed(values))
 
-    def store(self, address, value, size):
-        current = address
+    def store(self, base, offset, value, size):
         for index in range(size):
-            self.writes.append([[current, ".mem"], [self.cut(value,6-index*2,8-index*2)]])
-            if index + 1 < size:
-                current = self.alu("add", current, "00000001")
+            self.writes.append([[self.address(base, offset, index), ".mem"], [self.cut(value,6-index*2,8-index*2)]])
 
 
 def compile_instruction(pc, ins,optimize=False):
@@ -174,16 +193,13 @@ def compile_instruction(pc, ins,optimize=False):
     elif opcode == 0x63 and f3 in (0,1,4,5,6,7):
         a,b = w.reg(rs1),w.reg(rs2)
         condition = {0:"eq",1:"ne",4:"lt",5:"ge",6:"lt",7:"ge"}[f3]
-        compared = w.compare(a,b,signed=f3 in (4,5))
-        next_pc = w.mux(w.condition(compared,condition), word(pc+4), word(pc+imm_b))
+        next_pc = w.mux(w.decide(a,b,condition,signed=f3 in (4,5)), word(pc+4), word(pc+imm_b))
         label = {0:"BEQ",1:"BNE",4:"BLT",5:"BGE",6:"BLTU",7:"BGEU"}[f3]
     elif opcode == 0x03 and f3 in (0,1,2,4,5):
-        address = w.alu("add",w.reg(rs1),word(imm_i))
-        value = w.load(address, {0:1,1:2,2:4,4:1,5:2}[f3], signed=f3 in (0,1))
+        value = w.load(w.reg(rs1), imm_i, {0:1,1:2,2:4,4:1,5:2}[f3], signed=f3 in (0,1))
         label = {0:"LB",1:"LH",2:"LW",4:"LBU",5:"LHU"}[f3]
     elif opcode == 0x23 and f3 in (0,1,2):
-        address = w.alu("add",w.reg(rs1),word(imm_s))
-        w.store(address,w.reg(rs2),1 << f3)
+        w.store(w.reg(rs1),imm_s,w.reg(rs2),1 << f3)
         label = {0:"SB",1:"SH",2:"SW"}[f3]
     elif opcode in (0x13,0x33):
         a = w.reg(rs1)
@@ -196,8 +212,7 @@ def compile_instruction(pc, ins,optimize=False):
             op = {4:"xor",6:"or",7:"and"}[f3]
             value,label = w.alu(op,a,b),op.upper()
         elif f3 in (2,3) and (immediate or f7 == 0):
-            condition = w.condition(w.compare(a,b,signed=f3 == 2),"lt")
-            value,label = w.copy("0000000",condition),"SLT" if f3 == 2 else "SLTU"
+            value,label = w.copy("0000000",w.decide(a,b,"lt",signed=f3 == 2)),"SLT" if f3 == 2 else "SLTU"
         elif (f3 == 1 and f7 == 0) or (f3 == 5 and f7 in (0,32)):
             kind = "sll" if f3 == 1 else ("sra" if f7 == 32 else "srl")
             if immediate:

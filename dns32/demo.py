@@ -88,7 +88,7 @@ def start(program,backend,fast):
             command+=['artifacts/tick-checkpoint/program.elf','--checkpoint','artifacts/tick-checkpoint','--steps','3000000','--seconds','1800','--preview','5']
         else:command+=['artifacts/rv32/fibonacci.elf','--steps','1000','--seconds','60']
         command+=['--server',backend,'--output',str(relative)]
-        if fast:command+=['--client','native','--pipeline','--optimize','--packed','--blocks']
+        if fast:command+=['--client','native','--pipeline','--optimize','--packed','--blocks','--sequencer','native','--transport','udp','--commit-every','8']
         job={'id':ident,'program':program,'backend':backend,'fast':fast,'phase':'starting','started':time.time(),'output':out}
         save_job(job)
         thread=threading.Thread(target=work,args=(job,command),daemon=True);job['thread']=thread;thread.start()
