@@ -90,6 +90,7 @@ def fuse(items):
             for reg,value in written.items():
                 if reg=='pc.reg':pc_value=value
                 else:registers[reg]=value
+    if pc_value is None:raise ValueError('A fused block must end with an instruction that sets the PC')
     writes=memory+[[[n],v] for n,v in registers.items()]+[[['pc.reg'],pc_value]]
     last=items[-1]
     trap=False if isinstance(last,dict) and 'branch' in last else last['trap']
@@ -134,7 +135,7 @@ def compile_blocks(image,maximum=16,extra_leaders=(),arm_limit=6):
             if p['label'] in BRANCHES:
                 target=branch_target(pc,p)
                 arm=[code.get(a) for a in range(pc+4,target,4)] if pc<target<=pc+4*(arm_limit+1) else []
-                if arm and count+1+len(arm)<maximum and target in code and target not in hard and not any(
+                if arm and count+1+len(arm)<maximum and target in code and 'invalid' not in code[target] and target not in hard and not any(
                         a in hard for a in range(pc+4,target,4)) and all(
                         a and 'invalid' not in a and a['label'] not in END and a['label'] not in STORES for a in arm):
                     group.append({'branch':p,'arm':arm});count+=1+len(arm);pc=target;joined=True;continue

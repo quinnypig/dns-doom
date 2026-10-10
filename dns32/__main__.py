@@ -111,12 +111,12 @@ def main():
                     status="checkpoint-returned";break
                 if now-start>=args.seconds:break
                 if executed>=args.steps:break
+            if args.sequencer=='native':
+                from .optimized import flush
+                flush(bus)   # the final register commit is part of the measured work
             elapsed=time.monotonic()-start
             if profiler:
                 profiler.disable();profiler.dump_stats(str(out/"execution.prof"))
-            if args.sequencer=='native':
-                from .optimized import flush
-                flush(bus)
             regs={f"r{i:02}":bus.txt(f"r{i:02}.reg") for i in range(32)}
             pc=bus.txt("pc.reg")
             extra={}

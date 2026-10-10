@@ -8,6 +8,8 @@
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include <sys/socket.h>
+#include <sys/time.h>
+#include <unistd.h>
 #include <cerrno>
 #include <cstring>
 #include <map>
@@ -56,6 +58,11 @@ static string parse_txt(const string& s){
         if(type==16){found++;while(p<end){unsigned n=(unsigned char)s[p++];if(p+n>end)throw std::runtime_error("Truncated TXT");result.append(s,p,n);p+=n;}}p=end;}
     if(found!=1)throw std::runtime_error("Expected exactly one TXT record");
     return result;}
+// A reply must echo the request's question (name, type, class); matching only the
+// 16-bit ID would let a delayed datagram answer a different question after ID reuse.
+static void same_question(const string& request,const string& reply,const string& what){
+    if(request.size()<12||reply.size()<request.size()||reply.compare(12,request.size()-12,request,12,request.size()-12)!=0)
+        throw std::runtime_error("DNS reply does not match the question for "+what);}
 static unsigned rcode(const string& reply,const string& what){unsigned flags=r16(reply,2);if(!(flags&0x8000))throw std::runtime_error("DNS reply is not a response for "+what);return flags&15;}
 
 // ---- Python-facing primitives (unchanged behaviour) ------------------------
@@ -100,8 +107,12 @@ static PyObject* compile_plan(PyObject*,PyObject* args){PyObject *stages,*writes
         n=PySequence_Size(writes);for(Py_ssize_t i=0;i<n;i++){PyObject* w=PySequence_GetItem(writes,i);PyObject *nm,*val;if(!w||!PyArg_ParseTuple(w,"OO",&nm,&val)){Py_XDECREF(w);throw std::runtime_error("Expected (name,value)");}
             try{plan->writes.emplace_back(parts_of(nm),parts_of(val));}catch(...){Py_DECREF(w);throw;}Py_DECREF(w);}
         n=PySequence_Size(skips);for(Py_ssize_t i=0;i<n;i++){PyObject* s=PySequence_GetItem(skips,i);int cond,length;if(!s||!PyArg_ParseTuple(s,"ii",&cond,&length)){Py_XDECREF(s);throw std::runtime_error("Expected (cond,length)");}plan->skips.emplace_back(cond,length);Py_DECREF(s);}
+        if(wires<1)throw std::runtime_error("A plan needs at least the state wire");
         if(state_write<0||(size_t)state_write>=plan->writes.size())throw std::runtime_error("Invalid state write index");
-        for(auto& st:plan->stages)for(auto* v:{&st.copies,&st.queries})for(auto& s:*v){if(s.out<0||s.out>=wires)throw std::runtime_error("Wire index out of range");for(auto& p:s.parts)if(!p.literal&&(p.wire<0||p.wire>=wires))throw std::runtime_error("Wire index out of range");}
+        auto check=[&](const std::vector<Part>& parts){for(auto& p:parts)if(!p.literal&&(p.wire<0||p.wire>=wires))throw std::runtime_error("Wire index out of range");};
+        for(auto& st:plan->stages)for(auto* v:{&st.copies,&st.queries})for(auto& s:*v){if(s.out<0||s.out>=wires)throw std::runtime_error("Wire index out of range");check(s.parts);}
+        for(auto& w:plan->writes){check(w.first);check(w.second);}
+        for(auto& sk:plan->skips)if(sk.first<0||sk.first>=wires)throw std::runtime_error("Wire index out of range");
     }catch(const std::exception& e){delete plan;PyErr_SetString(PyExc_ValueError,e.what());return nullptr;}
     return PyCapsule_New(plan,CAPSULE,plan_free);}
 
@@ -128,13 +139,22 @@ static void lookups(const std::vector<int>& fds,const std::vector<Step>& queries
             std::vector<string> replies=receive(fds[lane],reqs[lane].size());c.trips++;c.transactions+=reqs[lane].size();
             std::vector<char> seen(reqs[lane].size(),0);
             for(auto& reply:replies){auto it=ids.find(reply.substr(0,2));if(it==ids.end()||seen[it->second]++)throw std::runtime_error("Unexpected DNS response ID");size_t k=it->second,i=index[lane][k];
-                c.payload+=reqs[lane][k].size()+reply.size();
+                c.payload+=reqs[lane][k].size()+reply.size();same_question(reqs[lane][k],reply,names[i]);
                 unsigned rc=rcode(reply,names[i]);if(rc)throw std::runtime_error("DNS RCODE "+std::to_string(rc)+" for "+names[i]);
                 wires[queries[start+i].out]=parse_txt(reply);
                 if(sample_room>0){samples.emplace_back(names[i],std::make_pair(reqs[lane][k].size(),reply.size()));sample_room--;}}
         }
     }
 }
+
+// Replace a connected UDP socket in place (same fd number) with a fresh one to the
+// same peer, so any datagram still in flight for the old source port is dropped.
+static void rotate(int fd){
+    sockaddr_storage peer;socklen_t plen=sizeof(peer);if(getpeername(fd,(sockaddr*)&peer,&plen)<0)throw std::runtime_error(string("DNS getpeername: ")+strerror(errno));
+    timeval tv;socklen_t tlen=sizeof(tv);if(getsockopt(fd,SOL_SOCKET,SO_RCVTIMEO,&tv,&tlen)<0)throw std::runtime_error(string("DNS getsockopt: ")+strerror(errno));
+    int nfd=socket(peer.ss_family,SOCK_DGRAM,0);if(nfd<0)throw std::runtime_error(string("DNS socket: ")+strerror(errno));
+    if(setsockopt(nfd,SOL_SOCKET,SO_RCVTIMEO,&tv,sizeof(tv))<0||connect(nfd,(sockaddr*)&peer,plen)<0||dup2(nfd,fd)<0){int e=errno;close(nfd);throw std::runtime_error(string("DNS socket rotate: ")+strerror(e));}
+    close(nfd);}
 
 // UDP lanes: each lane is a connected datagram socket with a receive timeout.
 // Lost datagrams (practically impossible on loopback) are simply re-sent.
@@ -147,7 +167,10 @@ static void lookups_udp(const std::vector<int>& fds,const std::vector<Step>& que
         std::vector<string> names(count),reqs(count);std::vector<std::map<string,size_t>> pending(lanes);
         for(size_t i=0;i<count;i++){size_t lane=i/each;names[i]=build(queries[start+i].parts,wires);next_id=(next_id+1)&65535;reqs[i]=encode_query(next_id,names[i]);
             if(!pending[lane].emplace(reqs[i].substr(0,2),i).second)throw std::runtime_error("Duplicate DNS request IDs");}
-        for(size_t lane=0;lane<lanes;lane++){for(auto& kv:pending[lane]){const string& r=reqs[kv.second];if(send(fds[lane],r.data(),r.size(),MSG_NOSIGNAL)<0)throw std::runtime_error(string("DNS send: ")+strerror(errno));}c.trips++;}
+        for(size_t lane=0;lane<lanes;lane++){
+            if(pending[lane].empty())continue;
+            for(auto& kv:pending[lane]){const string& r=reqs[kv.second];if(send(fds[lane],r.data(),r.size(),MSG_NOSIGNAL)<0)throw std::runtime_error(string("DNS send: ")+strerror(errno));}
+            c.trips++;}
         for(size_t lane=0;lane<lanes;lane++){
             int attempts=0;char buffer[65536];
             while(!pending[lane].empty()){
@@ -156,18 +179,20 @@ static void lookups_udp(const std::vector<int>& fds,const std::vector<Step>& que
                         for(auto& kv:pending[lane]){const string& r=reqs[kv.second];if(send(fds[lane],r.data(),r.size(),MSG_NOSIGNAL)<0)throw std::runtime_error(string("DNS send: ")+strerror(errno));}c.trips++;continue;}
                     throw std::runtime_error(string("DNS recv: ")+strerror(errno));}
                 if(got<12)continue;string reply(buffer,got);auto it=pending[lane].find(reply.substr(0,2));if(it==pending[lane].end())continue;   // stale duplicate
-                size_t i=it->second;pending[lane].erase(it);c.transactions++;c.payload+=reqs[i].size()+reply.size();
+                size_t i=it->second;if(reply.size()<reqs[i].size()||reply.compare(12,reqs[i].size()-12,reqs[i],12,reqs[i].size()-12)!=0)continue;   // same ID, different question: stale
+                pending[lane].erase(it);c.transactions++;c.payload+=reqs[i].size()+reply.size();
                 unsigned flags=r16(reply,2);if(flags&0x200)throw std::runtime_error("Truncated UDP answer for "+names[i]);
                 unsigned rc=rcode(reply,names[i]);if(rc)throw std::runtime_error("DNS RCODE "+std::to_string(rc)+" for "+names[i]);
                 wires[queries[start+i].out]=parse_txt(reply);
                 if(sample_room>0){samples.emplace_back(names[i],std::make_pair(reqs[i].size(),reply.size()));sample_room--;}
             }
+            if(attempts)rotate(fds[lane]);   // a retransmit happened: late duplicates must not meet a reused ID
         }
     }
 }
 
 // run(tcp_fds, udp_fds, plan, state, committed_state, commit, next_id, sample_room) ->
-//   (new_state, next_plan_text_or_None, [arm skipped...], transactions, payload_bytes, round_trips, next_id, [(name,req,resp)...])
+//   (new_state, next_plan_text_or_None, [arm skipped...], transactions, payload_bytes, round_trips, next_id, [(name,req,resp)...], [memory names written])
 // `state` is the register wire carried into this block; `committed_state` is what DNS
 // currently holds and is the UPDATE prerequisite when `commit` is set. Memory writes
 // are always committed (a block with stores must be run with commit set).
@@ -187,7 +212,7 @@ static PyObject* run(PyObject*,PyObject* args){PyObject *fdlist,*udplist,*cap;co
             else lookups_udp(udp,stage.queries,wires,next_id,c,sample_room,samples);
         }
         std::vector<std::pair<string,string>> changes;for(auto& w:plan->writes)changes.emplace_back(build(w.first,wires),build(w.second,wires));
-        const string& new_state=changes[plan->state_write].second;if(new_state.size()<8)throw std::runtime_error("Invalid state value");
+        const string& new_state=changes[plan->state_write].second;if(new_state.size()!=264)throw std::runtime_error("Invalid state value");
         if(!commit&&changes.size()!=1)throw std::runtime_error("A block with memory writes must commit");
         string previous=committed_c;string next_name=new_state.substr(0,8)+".code";
         std::vector<string> reqs;if(commit)reqs.push_back(encode_update(id(),changes,&previous,"state.reg"));reqs.push_back(encode_query(id(),next_name));
@@ -197,6 +222,7 @@ static PyObject* run(PyObject*,PyObject* args){PyObject *fdlist,*udplist,*cap;co
         size_t q=reqs.size()-1;
         if(commit){unsigned rc=rcode(ordered[0],"UPDATE");if(rc)throw std::runtime_error("DNS RCODE "+std::to_string(rc)+" for UPDATE");
             if(sample_room>0){samples.emplace_back("UPDATE",std::make_pair(reqs[0].size(),ordered[0].size()));sample_room--;}}
+        same_question(reqs[q],ordered[q],next_name);
         unsigned rc=rcode(ordered[q],next_name);PyObject* next_raw;
         if(rc==3){Py_INCREF(Py_None);next_raw=Py_None;}   // speculative fetch past the last plan
         else if(rc)throw std::runtime_error("DNS RCODE "+std::to_string(rc)+" for "+next_name);
@@ -204,7 +230,8 @@ static PyObject* run(PyObject*,PyObject* args){PyObject *fdlist,*udplist,*cap;co
             if(sample_room>0){samples.emplace_back(next_name,std::make_pair(reqs[q].size(),ordered[q].size()));sample_room--;}}
         PyObject* skipped=PyList_New(plan->skips.size());for(size_t i=0;i<plan->skips.size();i++){PyObject* b=wires[plan->skips[i].first]=="1"?Py_True:Py_False;Py_INCREF(b);PyList_SET_ITEM(skipped,i,b);}
         PyObject* samp=PyList_New(samples.size());for(size_t i=0;i<samples.size();i++)PyList_SET_ITEM(samp,i,Py_BuildValue("(snn)",samples[i].first.c_str(),(Py_ssize_t)samples[i].second.first,(Py_ssize_t)samples[i].second.second));
-        PyObject* result=Py_BuildValue("(s#NNlllIN)",new_state.data(),(Py_ssize_t)new_state.size(),next_raw,skipped,c.transactions,c.payload,c.trips,next_id,samp);
+        PyObject* written=PyList_New(0);for(size_t i=0;i<changes.size();i++)if((int)i!=plan->state_write){PyObject* n=PyUnicode_FromString(changes[i].first.c_str());PyList_Append(written,n);Py_DECREF(n);}
+        PyObject* result=Py_BuildValue("(s#NNlllINN)",new_state.data(),(Py_ssize_t)new_state.size(),next_raw,skipped,c.transactions,c.payload,c.trips,next_id,samp,written);
         return result;
     }catch(const std::exception& e){PyErr_SetString(PyExc_RuntimeError,e.what());return nullptr;}}
 

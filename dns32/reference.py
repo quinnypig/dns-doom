@@ -23,6 +23,7 @@ class Reference:
         self.regs=[0]*32
         self.pc=image["entry"]
         self.steps=0
+        self.written=set()
 
     def read(self,address,size):
         return sum(self.memory.get((address+i)&0xffffffff,0)<<(8*i) for i in range(size))
@@ -39,7 +40,7 @@ class Reference:
             elif name.endswith(".reg"):
                 index=int(name[1:3])
                 if index:self.regs[index]=int(value,16)
-            elif name.endswith(".mem"):self.memory[int(name[:-4],16)]=int(value,16)
+            elif name.endswith(".mem"):self.memory[int(name[:-4],16)]=int(value,16);self.written.add(int(name[:-4],16))
             else:raise ValueError(name)
 
     def step(self,io=None):
