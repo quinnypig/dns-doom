@@ -67,7 +67,7 @@ and result endpoints.
 
 ## GitHub Actions CI/CD
 
-Repository: https://github.com/pipeline-of-regret/dns-doom (private).
+Repository: https://github.com/quinnypig/dns-doom (private).
 The publishing checkout is `/home/cquinn/src/dns-doom-repository`; the original
 scratch history remains local because it contains oversized generated logs.
 PureDOOM is vendored with its upstream license and shareware WAD.
@@ -105,8 +105,8 @@ Do not run the old manual in-place update procedure against a release directory.
 ```sh
 systemctl --user status dnsdoom-actions.service
 journalctl --user -u dnsdoom-actions.service -n 100
-gh run list --repo pipeline-of-regret/dns-doom
-gh workflow run ci.yml --repo pipeline-of-regret/dns-doom --ref main
+gh run list --repo quinnypig/dns-doom
+gh workflow run ci.yml --repo quinnypig/dns-doom --ref main
 ```
 
 ## Public viewing and interactive access

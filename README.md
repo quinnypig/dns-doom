@@ -1,4 +1,4 @@
-[![Test and deploy](https://github.com/pipeline-of-regret/dns-doom/actions/workflows/ci.yml/badge.svg)](https://github.com/pipeline-of-regret/dns-doom/actions/workflows/ci.yml)
+[![Test and deploy](https://github.com/quinnypig/dns-doom/actions/workflows/ci.yml/badge.svg)](https://github.com/quinnypig/dns-doom/actions/workflows/ci.yml)
 
 Live deployment: https://doom.shitposting.cloud (public read-only view).
 Pushes to `main` run validation and automatically deploy on success.
