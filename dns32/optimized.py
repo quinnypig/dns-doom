@@ -150,12 +150,15 @@ class PackedRegisters:
         return self.bus.txt(name)
     def commit(self,changes,previous_pc=None,prerequisite='pc.reg'):
         if any(n.endswith('.reg') and n!='state.reg' for n,v in changes):
-            state=self.bus.txt('state.reg');updated=state;other=[]
+            # Base the edit on registers carried as wires, if any; the prerequisite names
+            # the state DNS last accepted, so the server still rejects divergence.
+            carried=getattr(self,'cached_state',None);committed=getattr(self,'committed_state',None)
+            state=carried if carried is not None else self.bus.txt('state.reg');updated=state;other=[]
             if previous_pc is not None and state[:8]!=previous_pc:raise RuntimeError('Stale packed PC')
             for name,value in changes:
                 if name.endswith('.reg'):
                     i=self.offset(name);updated=updated[:i]+value+updated[i+8:]
                 else:other.append((name,value))
-            self.bus.commit(other+[('state.reg',updated)],state,prerequisite='state.reg')
+            self.bus.commit(other+[('state.reg',updated)],committed if committed is not None else state,prerequisite='state.reg')
             self.cached_state=self.committed_state=updated;self.chained=0
         else:self.bus.commit(changes,previous_pc,prerequisite=prerequisite)

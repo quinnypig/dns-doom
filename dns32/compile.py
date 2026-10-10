@@ -4,8 +4,8 @@ import struct
 import hashlib
 
 # Chosen from the measured constant-add histogram of the verified Doom tick
-# (artifacts/performance/offsets.txt): these 64 offsets cover about 84% of the
-# constant additions the tick performs. Each costs 65,536 add16 records.
+# (artifacts/performance/offsets.txt): these 64 offsets cover about 78% of the
+# constant additions the tick performs (the previous 15 covered 42%). Each costs 65,536 add16 records.
 FAST_OFFSETS=(-1236,-1235,-1234,-1233,-1232,-1231,-1230,-1229,-1228,-1227,-1226,-1225,-1216,-1215,-1214,-1213,
               -320,-1,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,
               33,36,37,38,39,40,41,42,43,44,45,46,47,320)

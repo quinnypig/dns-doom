@@ -26,8 +26,12 @@ class BlockTests(unittest.TestCase):
 
 from dns32.blocks import compile_blocks
 
+def plan_or_invalid(pc,ins):
+    try:return compile_instruction(pc,ins,True)
+    except ValueError as error:return {'invalid':str(error)}   # as load_elf records inline data
+
 def image_of(instructions,base=0x1000):
-    code={base+4*i:compile_instruction(base+4*i,ins,True) for i,ins in enumerate(instructions)}
+    code={base+4*i:plan_or_invalid(base+4*i,ins) for i,ins in enumerate(instructions)}
     return {'entry':base,'code':code,'symbols':{},'memory':{}}
 
 ADDI_R1=(1<<20)|(1<<15)|(1<<7)|0x13          # addi r1,r1,1
@@ -95,3 +99,10 @@ class HammockTests(unittest.TestCase):
             self.assertEqual(bus.last_instructions,executed,case)
             self.assertEqual(len(bus.last_labels),executed,case)
         self.assertEqual(fused,400);self.assertGreater(taken,50);self.assertGreater(400-taken,50)
+
+class HammockEdgeTests(unittest.TestCase):
+    def test_branch_over_arm_into_invalid_word_is_not_predicated(self):
+        # BNE +8 skips one ADDI and lands on inline data; the join must not be fused.
+        image=image_of([branch(1,1,2,8),ADDI_R1,0xffffffff,JAL]);compile_blocks(image)
+        self.assertNotIn('skips',image['code'][0x1000])
+        self.assertIn('invalid',image['code'][0x1008])

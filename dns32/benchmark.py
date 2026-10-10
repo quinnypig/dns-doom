@@ -25,9 +25,10 @@ def main():
     reference_io=device(out/'reference',saved['devices'])
     for _ in range(a.steps):oracle.step(reference_io)
     reference_io.close()
-    # Every DNS memory record the prefix can change is one the reference changed too
-    # (host DMA included); state.reg always changes. This set drives verification and restore.
-    touched=sorted(f'{address:08x}.mem' for address,value in oracle.memory.items() if value!=image['memory'].get(address,0))
+    # Every RAM byte the reference wrote (host DMA included), whether or not its final
+    # value differs from the initial one. The DNS side's own write set is added per run,
+    # so an erroneous extra write is verified too.
+    expected=sorted(f'{address:08x}.mem' for address in oracle.written)
     if a.blocks:
         from .blocks import compile_blocks
         compile_blocks(image,extra_leaders=[oracle.pc])
@@ -38,7 +39,7 @@ def main():
         if a.native:
             from .native import NativeBus
             raw=NativeBus(connections=a.connections,transport=a.transport)
-        else:raw=Bus()
+        else:raw=Bus();raw.written=set()
         bus=raw
         if a.packed:
             from .optimized import PackedRegisters
@@ -56,15 +57,17 @@ def main():
         for run in range(a.repeat):
             io=device(out/f'run-{run}',saved['devices'])
             before=raw.transactions;packets=getattr(raw,'round_trips',raw.transactions)
+            raw.written=set()
             start=time.perf_counter()
             executed=0
             while executed<a.steps:
                 execute(io);executed+=getattr(bus,'last_instructions',1)
             assert executed==a.steps,'Benchmark boundary was crossed'
-            elapsed=time.perf_counter()-start
             if a.sequencer=='native':
                 from .optimized import flush
-                flush(bus)
+                flush(bus)   # the final register commit is part of the measured work
+            elapsed=time.perf_counter()-start
+            touched=sorted(set(expected)|raw.written)
             result={'seconds':elapsed,'instructions':a.steps,'dns_transactions':raw.transactions-before,'batches':getattr(raw,'round_trips',raw.transactions)-packets}
             assert [int(bus.txt(f'r{i:02}.reg'),16) for i in range(32)]==oracle.regs,'Register mismatch'
             assert int(bus.txt('pc.reg'),16)==oracle.pc,'PC mismatch'

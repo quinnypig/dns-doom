@@ -59,7 +59,7 @@ per-message work, so the right trade is fewer messages, not shallower chains.
   tables: three lookups instead of five. Target bytes shared by both branch
   outcomes are copied rather than selected. The 64 most frequent constant
   offsets in the tick, measured with `dns32/offsets.py`, use the two-lookup
-  16-bit add path (84% of constant adds, up from 42%).
+  16-bit add path (78% of constant adds, up from 42%).
 * **Fewer commits.** Stores no longer end blocks unless a later instruction in
   the block loads. Short forward branches over straight-line arms are
   predicated: the arm's wiring always runs and each register it writes is
@@ -84,8 +84,9 @@ per-message work, so the right trade is fewer messages, not shallower chains.
   into a separate static zone would cut UPDATE cost from 65 µs to 40 µs but
   commits are now rare enough that this is a few percent.
 
-Over the 20,000-instruction prefix the lookups per instruction fell from 6.0 to
-4.7 and the commits from one per block to about one per four blocks.
+Over the 20,000-instruction prefix the table and memory lookups per instruction
+(excluding plan fetches and commits) fell from 6.0 to 4.7, and the commits from one
+per block to about one per four blocks.
 
 ### Round one (146.28 s): native transport, pipelining, packed state, blocks
 
@@ -136,11 +137,15 @@ implementation at that stage; each row includes all rows above it.
 | `minimal-responses yes` | 1.349 |
 | Registers carried across up to 8 blocks | 1.104 |
 | UDP lookups | 0.882 |
-| Branches against x0 via 16-bit halves | **0.886** |
+| Branches against x0 via 16-bit halves (fewer lookups, time within noise) | 0.886 |
+| Review fixes: reply question validation, final commit inside the timer | **0.916** |
 
 The final prefix is **9.4× faster than the Python baseline** and 2.4× faster
-than round one, using 100,805 transactions versus 120,308. Reports are in
-`artifacts/performance/<stage>/benchmark.json`.
+than round one, using 100,805 transactions versus 120,308. Round-two reports are in
+`artifacts/performance/<stage>/benchmark.json` (`t1-5-combined` through `t10-zero`);
+round-one artifacts were not kept in the repository. The first of the three repeats
+is consistently the slowest because plan decoding is cold; the median reports the
+warm steady state. The timer includes the final register commit.
 
 Knot was implemented and passed correctness tests, but was dramatically slower
 for this unusually large, continuously updated zone. Its bounded **100-instruction**
@@ -158,14 +163,13 @@ blocks, 300 blocks containing stores, and 400 predicated branch hammocks checked
 on both the taken and not-taken paths with per-path instruction accounting.
 Both BIND and Knot passed 80 live instruction cases and fault checks, and BIND
 passed them again through the native UDP sequencer. Those checks include
-corrupt/missing DNS answers, stale PC, and stale packed registers with an
-unchanged PC. The full final Doom run passed the independent pixel and state
+corrupt/missing DNS answers, a stale PC (rejected client-side before the commit),
+and stale packed registers with an unchanged PC (rejected by the server). The full final Doom run passed the independent pixel and state
 comparison. Public HTTPS browser tests exercised fresh Fibonacci and Doom runs,
 progress, evidence links, mobile layout, and JavaScript error checks; a separate
 immediate-stop test verified container cleanup.
 
 Relevant evidence is under `artifacts/performance/`, especially
-`v3-unit-tests.log`, `v3-bind-live.json`, `v3-knot-live.json`, and
-`public-final-test.log`. The original checkpoint ELF is preserved as
+`final-tests.log`, `bind-live.json`, `bind-live-native.json`, and `knot-live.json`. The original checkpoint ELF is preserved as
 `artifacts/tick-checkpoint/program.elf`; reference generation emits its own expected
 state so a rebuilt fixture can also be verified.

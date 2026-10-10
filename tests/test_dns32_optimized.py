@@ -54,3 +54,19 @@ class PrefetchTests(unittest.TestCase):
         self.assertEqual(bus.code_reads,3)       # every plan is still fetched from DNS, once per block
         invalidate(bus)
         self.assertIsNone(getattr(bus,'cached_state',None))
+
+from dns32.optimized import PackedRegisters,flush
+
+class ChainedCommitTests(unittest.TestCase):
+    """Registers carried as wires between commits must survive a peripheral register write."""
+    def test_peripheral_commit_keeps_carried_registers(self):
+        pc=0x1000;plans={pc+4*i:compile_instruction(pc+4*i,(1<<20)|(1<<15)|(1<<7)|0x13,True) for i in range(3)}   # addi r1,r1,1
+        raw=CountingBus({'entry':pc,'memory':{}},plans);bus=PackedRegisters(raw)
+        committed=raw.txt('state.reg')
+        carried=f'{pc+4:08x}'+'00000000'+'00000001'+committed[24:]   # pc, x0, r1=1: as if one block ran without committing
+        bus.cached_state=carried;bus.committed_state=committed;bus.chained=1
+        bus.commit([('r10.reg','12345678')])                   # a host device writes a return value
+        self.assertEqual(raw.pc,pc+4);self.assertEqual(raw.regs[1],1);self.assertEqual(raw.regs[10],0x12345678)
+        self.assertEqual(bus.cached_state,bus.committed_state);self.assertEqual(bus.chained,0)
+        flush(bus)   # nothing pending: must be a no-op
+        self.assertEqual(raw.regs[10],0x12345678)

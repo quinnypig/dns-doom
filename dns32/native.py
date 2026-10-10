@@ -30,6 +30,7 @@ class NativeBus(Bus):
             s.setsockopt(socket.SOL_SOCKET,socket.SO_SNDTIMEO,struct.pack('ll',10,0))
             s.setsockopt(socket.IPPROTO_TCP,socket.TCP_NODELAY,1)
         self.round_trips=0
+        self.written=set()   # memory record names this bus has committed (for verification/restore)
 
     def close(self):
         for s in self.sockets+self.udp:s.close()
@@ -68,10 +69,12 @@ class NativeBus(Bus):
     def txt(self,name):return self.txt_many([name])[0]
 
     def commit(self,changes,previous_pc=None,prerequisite='pc.reg'):
+        self.written.update(n for n,_ in changes if n.endswith('.mem'))
         self.exchange_many([wire.update(self.next_id(),changes,previous_pc,prerequisite)],['UPDATE'])
 
     def commit_and_fetch(self,changes,previous,prerequisite,name):
         """One round trip: the UPDATE and the next block's immutable plan query."""
+        self.written.update(n for n,_ in changes if n.endswith('.mem'))
         update=wire.update(self.next_id(),changes,previous,prerequisite)
         query=wire.query(self.next_id(),name)
         replies=self.exchange_many([update,query],['UPDATE',name],lenient=(1,))
@@ -112,9 +115,10 @@ class NativeSequencer:
     def step(self,state,raw,committed,commit):
         plan,capsule=self.plan(raw)
         bus=self.bus
-        new_state,next_raw,skipped,transactions,payload,trips,bus.sequence,samples=wire.run(
+        new_state,next_raw,skipped,transactions,payload,trips,bus.sequence,samples,written=wire.run(
             [s.fileno() for s in bus.sockets],[u.fileno() for u in bus.udp],capsule,state,committed,commit,
             bus.sequence,max(0,bus.sample_limit-len(bus.samples)))
         bus.transactions+=transactions;bus.payload_bytes+=payload;bus.round_trips+=trips
+        if written:bus.written.update(written)
         bus.samples.extend({'name':n,'request_bytes':a,'response_bytes':b} for n,a,b in samples)
         return plan,new_state,next_raw,skipped
