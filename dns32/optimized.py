@@ -96,7 +96,7 @@ def step(bus,io=None,pipeline=True,packed=False):
             bus.commit(changes,state,prerequisite='state.reg');bus.prefetched_plan=None
         else:
             bus.prefetched_plan=fetch(changes,state,'state.reg',next_pc+'.code')
-        bus.cached_state=new_state;bus.prefetched_pc=next_pc;bus.last_pc=next_pc
+        bus.cached_state=bus.committed_state=new_state;bus.chained=0;bus.prefetched_pc=next_pc;bus.last_pc=next_pc   # this path commits every block
     else:
         bus.commit(changes,pc)
         bus.last_pc=next(v for n,v in changes if n=='pc.reg')
