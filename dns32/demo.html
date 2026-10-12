@@ -29,16 +29,16 @@ a{color:#ddd}
 @media(max-width:700px){dl{grid-template-columns:1fr 1fr}}
 </style>
 <main>
-<header><h1>Doom on DNS</h1><p class="sub">A computer built from DNS records.</p></header>
+<header><h1>Doom on DNS</h1><p class="sub">A computer whose arithmetic and memory are DNS records.</p></header>
 <div id="empty">No frame yet.</div><img id="frame" class="hidden" width="96" height="48" alt="Doom frame, 96 by 48 pixels, read from DNS">
 <div id="status"><span id="phase">Idle</span><span id="detail"></span></div>
 <progress id="progress" class="hidden" value="0" max="1389327"></progress>
 <pre id="error" class="hidden"></pre>
-<div id="controls" class="hidden"><button id="run">Press Right</button><button id="stop" disabled>Stop</button><span>Runs one game tick through DNS.</span></div>
-<dl><div><dt>Instructions</dt><dd id="instructions">—</dd></div><div><dt>DNS transactions</dt><dd id="queries">—</dd></div><div><dt>Seconds</dt><dd id="elapsed">—</dd></div><div><dt>Checked against reference</dt><dd id="verification">—</dd></div></dl>
+<div id="controls" class="hidden"><button id="run">Press Right</button><button id="stop" disabled>Stop</button><span>One game tick. About a minute, plus zone loading.</span></div>
+<dl><div><dt>RISC-V instructions</dt><dd id="instructions">—</dd></div><div><dt>DNS transactions</dt><dd id="queries">—</dd></div><div><dt>Execution seconds</dt><dd id="elapsed">—</dd></div><div><dt>Emulator comparison</dt><dd id="verification">—</dd></div></dl>
 <details><summary>How this works</summary>
-<p>Doom is compiled for RISC-V and runs on a 32-bit machine whose arithmetic and memory are records in a stock BIND server. Every arithmetic result and every byte of memory is a DNS record; the program runs by issuing queries and dynamic updates to an unmodified BIND on one Linux host. A small Python program supplies the wiring and the clock. Cloudflare's DNS is not involved in the computation.</p>
-<p>A run starts from a prepared E1M1 checkpoint with the Right key held, executes one game tick, and renders the 96×48 viewport. Pixels, registers, game state, and the program counter are then compared with an independent emulator. Zone loading happens before the timer starts. This is one tick, not interactive play.</p>
+<p>Doom is compiled for 32-bit RISC-V. Instruction decoding happens offline. At runtime, every arithmetic result and every byte of memory is a DNS record; a small Python program supplies the wiring and the clock. A 32-bit add is four lookups. Stock BIND 9.20 runs in a container with networking disabled. All DNS traffic stays inside it. Cloudflare is not involved in the computation.</p>
+<p>An independent local emulator initializes E1M1 and saves a checkpoint with the viewport cleared. Each run loads that checkpoint, holds Right for one game tick, and renders a 96×48 view. The result is checked against the emulator: every pixel, all 32 registers, the program counter, and the checked game-state fields. Zone loading happens before the timer starts. This does not cold-boot Doom. It is not playable.</p>
 <p id="facts"></p>
 <p><a id="report" class="hidden" href="/api/report" target="_blank">Run report</a></p>
 </details>
@@ -80,7 +80,7 @@ else if(s.phase==='stopped'){$('phase').textContent='Stopped'+label;$('detail').
 else{$('phase').textContent='Failed'+label;$('detail').textContent=s.finished?when(s.finished):''}
 const r=s.report;
 if(r&&r.view){$('verification').textContent=verdict(r);
-$('facts').textContent=`Game tick ${r.engine_before.gametic} → ${r.engine_after.gametic}. ${fmt(r.view.width*r.view.height)} pixels rendered. ${checkSentence(r)} ${fmt(r.clock_cycles)} clock cycles, ${fmt(r.network_batches)} DNS batches. Backend: ${r.backend}.`;$('report').classList.remove('hidden')}
+$('facts').textContent=`Game tick ${r.engine_before.gametic} → ${r.engine_after.gametic}. ${fmt(r.view.width*r.view.height)} pixels rendered. ${checkSentence(r)} ${fmt(r.clock_cycles)} block clocks, ${fmt(r.network_batches)} DNS round trips. DNS server: ${r.backend}.`;$('report').classList.remove('hidden')}
 else if(r&&r.results){$('verification').textContent=r.exit_code===0?'Exit 0':'Exit '+r.exit_code;$('facts').textContent='Output: '+r.results.join(', ')}
 else if(s.phase==='complete')$('verification').textContent='—';
 if(s.error||s.failure)showError(s.failure?.error||s.error);

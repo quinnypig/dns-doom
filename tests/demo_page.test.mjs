@@ -99,5 +99,5 @@ test('a new run id replaces the previous result',async()=>{
 test('visible labels use the agreed wording',()=>{
   assert.match(html,/<dt>DNS transactions<\/dt>/);
   assert.doesNotMatch(html,/DNS queries/);
-  assert.match(html,/<p class="sub">A computer built from DNS records\.<\/p>/);
+  assert.match(html,/<p class="sub">A computer whose arithmetic and memory are DNS records\.<\/p>/);
 });
