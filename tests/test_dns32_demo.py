@@ -92,3 +92,17 @@ class PageScriptTests(unittest.TestCase):
         if not node:self.skipTest('node is not installed; run `node --test tests/demo_page.test.mjs` where it is')
         result=subprocess.run([node,'--test',str(Path(__file__).with_name('demo_page.test.mjs'))],capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+
+
+class LiveMountTests(unittest.TestCase):
+    def test_run_mounts_the_shared_live_directory(self):
+        """Release checkouts symlink artifacts/live outside the checkout; the container must see it."""
+        from unittest.mock import patch
+        import dns32.demo as demo
+        commands=[]
+        with patch.object(demo,'work',lambda job,command:commands.append(command)),patch.object(demo,'job',None):
+            ident=demo.start('fibonacci','bind',True)
+        command=commands[0];live=(demo.ROOT/'artifacts/live').resolve()
+        self.assertIn(f'type=bind,src={live},dst=/live',command)
+        self.assertIn('/live/'+ident,command)
+        import shutil;shutil.rmtree(demo.ROOT/'artifacts/live'/ident,ignore_errors=True)
