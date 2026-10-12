@@ -80,14 +80,18 @@ def start(program,backend,fast):
         previous=sorted((ROOT/'artifacts/live').glob('*/job.json'),key=lambda p:p.stat().st_mtime,reverse=True)
         import shutil
         for old in previous[49:]:shutil.rmtree(old.parent)
-        ident=uuid.uuid4().hex[:10];relative=Path('artifacts/live')/ident;out=ROOT/relative;out.mkdir(parents=True)
+        ident=uuid.uuid4().hex[:10];out=ROOT/'artifacts/live'/ident;out.mkdir(parents=True)
+        # In a release checkout artifacts/live is a symlink to a shared directory outside the
+        # checkout, so it is mounted separately; the run writes to /live/<id> inside the container.
+        live=(ROOT/'artifacts/live').resolve()
         command=['docker','run','--rm','--name',SERVICE_ID+'-'+ident,'--label','dnsdoom.service='+SERVICE_ID,
                  '--network','none','--shm-size','4g','--memory','6g','--cpus','2','--pids-limit','256',
-                 '--user',f'{os.getuid()}:{os.getgid()}','--mount',f'type=bind,src={ROOT},dst=/work',IMAGE]
+                 '--user',f'{os.getuid()}:{os.getgid()}','--mount',f'type=bind,src={ROOT},dst=/work',
+                 '--mount',f'type=bind,src={live},dst=/live',IMAGE]
         if program=='doom':
             command+=['artifacts/tick-checkpoint/program.elf','--checkpoint','artifacts/tick-checkpoint','--steps','3000000','--seconds','1800','--preview','5']
         else:command+=['artifacts/rv32/fibonacci.elf','--steps','1000','--seconds','60']
-        command+=['--server',backend,'--output',str(relative)]
+        command+=['--server',backend,'--output','/live/'+ident]
         if fast:command+=['--client','native','--pipeline','--optimize','--packed','--blocks','--sequencer','native','--transport','udp','--commit-every','8']
         job={'id':ident,'program':program,'backend':backend,'fast':fast,'phase':'starting','started':time.time(),'output':out}
         save_job(job)
