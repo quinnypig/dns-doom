@@ -239,3 +239,11 @@ current toolchain; verification rejects changed inputs, missing checks,
 unsupported versions, or promotion of CPU success into live-DNS/deployment proof.
 The PR evidence workflow retains sanitized hash/reference receipts for 14 days.
 `live-dns-rerun`, `full-doom-rerun`, and deployment remain `not-observed`.
+
+The separate Component contract PR job validates declarations with the canonical
+fleet JSON Schema pinned at `977e851fbaacabb250b14ed2bb28c6aff9187e85`.
+The vendored schema and provenance are checked against the pinned SHA-256 before
+installing `jsonschema[format]==4.26.0`; no private repository credentials or
+sibling checkout are needed. Negative fixtures cover path traversal, unsupported
+versions/profiles, malformed schemas, and schema artifact tampering. These are
+real CI checks; repository branch-protection enforcement is not asserted here.
