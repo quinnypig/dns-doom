@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "repository": "pipeline-of-regret/dns-doom",
+  "repository": "quinnypig/dns-doom",
   "components": [
     {
       "id": "dns-doom",
@@ -21,7 +21,7 @@
         ]
       },
       "deployment": {
-        "owner": "pipeline-of-regret/dns-doom"
+        "owner": "quinnypig/dns-doom"
       },
       "telemetry": {
         "mode": "none"
@@ -46,7 +46,7 @@
         ]
       },
       "deployment": {
-        "owner": "pipeline-of-regret/dns-doom"
+        "owner": "quinnypig/dns-doom"
       },
       "telemetry": {
         "mode": "none"
@@ -71,7 +71,7 @@
         ]
       },
       "deployment": {
-        "owner": "pipeline-of-regret/dns-doom"
+        "owner": "quinnypig/dns-doom"
       },
       "telemetry": {
         "mode": "none"
@@ -96,7 +96,7 @@
         ]
       },
       "deployment": {
-        "owner": "pipeline-of-regret/dns-doom"
+        "owner": "quinnypig/dns-doom"
       },
       "telemetry": {
         "mode": "none"
