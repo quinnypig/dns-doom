@@ -215,3 +215,27 @@ instructions, wider words, and gate-depth batching before a Doom target.
 Background: [How Complex Is DNS?](https://www.microsoft.com/en-us/research/publication/how-complex-is-dns/),
 [Reachability Analysis of the Domain Name System](https://arxiv.org/abs/2411.10188),
 [DNS dynamic updates / RFC 2136](https://www.rfc-editor.org/rfc/rfc2136.html).
+
+## Evidence verification without a live DNS run
+
+`make check` builds the existing native transport for the selected Python ABI and
+runs the existing offline circuit, RV32 differential, demo and transport tests.
+It also checks the retained current tick against independent saved registers,
+PC, game state, and all 4,608 raw pixel bytes. No DNS server, Docker benchmark,
+full Doom run, or production session is started by this target. The existing
+full live-validation and deployment workflow remains separate.
+
+`.fleet/recorded-results.json` pins the exact retained output/oracle bytes and
+machine-readable headline claims. Missing or changed artifacts, disagreement
+with the oracle, unsupported claims, and README headline drift fail validation.
+These integrity checks are not an authenticity signature. The original run's
+source revision was not recorded and remains explicitly unknown.
+
+`make evidence` additionally requires a clean checkout and writes ignored
+`.fleet-evidence/inputs.json` and `release.json`. The receipt's source revision
+identifies the current verifier and CPU checks, not the historical DNS run.
+Its hashed input manifest binds every tracked source/artifact file and the
+current toolchain; verification rejects changed inputs, missing checks,
+unsupported versions, or promotion of CPU success into live-DNS/deployment proof.
+The PR evidence workflow retains sanitized hash/reference receipts for 14 days.
+`live-dns-rerun`, `full-doom-rerun`, and deployment remain `not-observed`.

@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "repository": "pipeline-of-regret/dns-doom",
+  "components": [
+    {
+      "id": "dns-doom",
+      "path": ".",
+      "profile": "experiment",
+      "lifecycle": "experimental",
+      "validation": {
+        "command": [
+          "make",
+          "check"
+        ],
+        "paths": [
+          "."
+        ],
+        "required_checks": [
+          "Experiment evidence"
+        ]
+      },
+      "deployment": {
+        "owner": "pipeline-of-regret/dns-doom"
+      },
+      "telemetry": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "dns1",
+      "path": "dnscpu",
+      "profile": "experiment",
+      "lifecycle": "experimental",
+      "validation": {
+        "command": [
+          "make",
+          "check"
+        ],
+        "paths": [
+          "dnscpu"
+        ],
+        "required_checks": [
+          "Experiment evidence"
+        ]
+      },
+      "deployment": {
+        "owner": "pipeline-of-regret/dns-doom"
+      },
+      "telemetry": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "dns-demo",
+      "path": "dns32",
+      "profile": "service",
+      "lifecycle": "active",
+      "validation": {
+        "command": [
+          "make",
+          "check"
+        ],
+        "paths": [
+          "dns32"
+        ],
+        "required_checks": [
+          "Experiment evidence"
+        ]
+      },
+      "deployment": {
+        "owner": "pipeline-of-regret/dns-doom"
+      },
+      "telemetry": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "deployment",
+      "path": "deploy",
+      "profile": "infrastructure",
+      "lifecycle": "active",
+      "validation": {
+        "command": [
+          "make",
+          "check"
+        ],
+        "paths": [
+          "deploy"
+        ],
+        "required_checks": [
+          "Experiment evidence"
+        ]
+      },
+      "deployment": {
+        "owner": "pipeline-of-regret/dns-doom"
+      },
+      "telemetry": {
+        "mode": "none"
+      }
+    }
+  ]
+}

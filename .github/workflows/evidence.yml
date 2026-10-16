@@ -1,0 +1,32 @@
+name: Experiment evidence
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    name: Experiment evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: '0.9.12'
+          python-version: '3.14'
+      - name: Bind CPU verification to retained experiment artifacts
+        run: make evidence
+      - name: Retain sanitized build and check receipts
+        if: always() && hashFiles('.fleet-evidence/release.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: experiment-evidence-${{ github.sha }}-${{ github.run_id }}
+          path: .fleet-evidence/*.json
+          include-hidden-files: true
+          retention-days: 14

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "historical_source_revision": null,
+  "provenance": "historical-run-source-not-recorded",
+  "artifacts": {
+    "artifacts/dns32-tick/run.json": "sha256:114bb24ca26e57a551a3c4ef7ec3be045641c8b52a625e6ca4d9a95253df98e8",
+    "artifacts/reference-verification/expected-state.json": "sha256:f06b304090d52467ab3219acb417386284dc7d563bea110f1077427dbc55795f",
+    "artifacts/dns32-tick/dns-view.png.indices": "sha256:f7e0d2837e829a66a8359b6a15b50a1ef4de45a58f3b3588f059f0e49ea57f46",
+    "artifacts/reference-verification/reference-view.png.indices": "sha256:f7e0d2837e829a66a8359b6a15b50a1ef4de45a58f3b3588f059f0e49ea57f46"
+  },
+  "claims": {
+    "instructions": 1389327,
+    "tick_seconds": 55.63,
+    "dns_transactions": 6962678,
+    "viewport_pixels": 4608
+  }
+}
