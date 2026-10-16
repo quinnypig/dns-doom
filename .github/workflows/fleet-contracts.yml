@@ -1,0 +1,29 @@
+name: Fleet component contract
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  component-contract:
+    name: Component contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GIT_LFS_SKIP_SMUDGE: '1'
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          lfs: false
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Verify pinned canonical schema provenance before installing tooling
+        run: python3 .fleet/component_schema.py --verify-provenance
+      - name: Install pinned generic JSON Schema validator
+        run: python3 -m pip install 'jsonschema[format]==4.26.0'
+      - name: Validate component declarations with canonical schema
+        run: python3 .fleet/component_schema.py
+      - name: Reject malformed declarations, unsupported versions and schema tampering
+        run: python3 .fleet/test-schema.py -v

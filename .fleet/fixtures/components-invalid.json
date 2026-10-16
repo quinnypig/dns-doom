@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "repository": "example/project",
+  "components": [
+    {
+      "id": "invalid-path",
+      "path": "../escape",
+      "profile": "service",
+      "lifecycle": "active",
+      "validation": {
+        "command": [
+          "make",
+          "check"
+        ],
+        "paths": [
+          "../escape"
+        ],
+        "required_checks": []
+      },
+      "deployment": {
+        "owner": "example/project"
+      },
+      "telemetry": {
+        "mode": "none"
+      }
+    }
+  ]
+}
