@@ -54,7 +54,7 @@ def main():
     (release / 'REVISION').write_text(revision + '\n')
     base_image = 'dnsdoom-base:' + revision
     image = 'dnsdoom:' + revision
-    run('docker', 'build', '-t', base_image, '.', cwd=release)
+    run('docker', 'build', '--pull', '-t', base_image, '.', cwd=release)
     run('docker', 'build', '-f', 'Dockerfile.rv32', '--build-arg',
         'BASE_IMAGE=' + base_image, '-t', image, '.', cwd=release)
     image_id = subprocess.check_output(['docker', 'image', 'inspect', image,

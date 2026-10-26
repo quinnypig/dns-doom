@@ -5,6 +5,10 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+  # Weekly rebuild so Debian security updates (BIND, etc.) reach production
+  # even when no commit lands.
+  schedule:
+    - cron: '23 9 * * 1'
 permissions:
   contents: read
 concurrency:
@@ -56,3 +60,5 @@ jobs:
           persist-credentials: false
       - name: Build, promote, and check production (automatic rollback on failure)
         run: python3 deploy/release.py
+      - name: Install the pinned cloudflared and restart the tunnel if it changed
+        run: python3 deploy/cloudflared.py ~/.local/lib/dnsdoom/cloudflared dnsdoom-tunnel.service https://doom.shitposting.cloud/

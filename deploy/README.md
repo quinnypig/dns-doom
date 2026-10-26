@@ -18,7 +18,12 @@ systemctl --user restart dnsdoom-tunnel.service
 `~/.config/dnsdoom/service.env` contains the private browser access key, immutable
 Docker image ID, and deployment label. `~/.config/dnsdoom/tunnel.token` contains
 the connector credential. Keep both files mode 0600 and out of Git. The installed
-cloudflared binary is `~/.local/lib/dnsdoom/cloudflared` (2026.9.3). Unit templates
+cloudflared binary is `~/.local/lib/dnsdoom/cloudflared`, at the version pinned in
+`deploy/cloudflared.version`. Renovate bumps that file; the deploy job runs
+`deploy/cloudflared.py`, which verifies the release checksum, swaps the binary,
+restarts the tunnel, and restores `cloudflared.prev` if the tunnel does not come
+back. The base image is pinned by digest so Renovate also picks up upstream
+Debian rebuilds, and CI redeploys weekly so `apt-get upgrade` runs regardless. Unit templates
 are in this directory; installed units are in `~/.config/systemd/user/`.
 
 Each computation runs in a Docker container with no network outside its private

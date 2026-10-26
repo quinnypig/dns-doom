@@ -1,0 +1,14 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["docker:pinDigests", "helpers:pinGitHubActionDigests"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "cloudflared binary installed on the host by deploy/cloudflared.py",
+      "managerFilePatterns": ["/(^|/)deploy/cloudflared\\.version$/"],
+      "matchStrings": ["^(?<currentValue>\\S+)\\s*$"],
+      "depNameTemplate": "cloudflare/cloudflared",
+      "datasourceTemplate": "github-releases"
+    }
+  ]
+}
